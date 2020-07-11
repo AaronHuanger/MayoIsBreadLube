@@ -7,5 +7,5 @@ abstract public class Layer
 {
     public Tile[][] tileMap;
     List<Player> players;
-    List<Enemies> enemies; 
+    List<Enemy> enemies; 
 }
