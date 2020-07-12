@@ -2,8 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-abstract public class Levels : MonoBehaviour
+abstract public class Map 
 {
-    List<Map> Maps; 
+    List<Layer> layers;
 }
