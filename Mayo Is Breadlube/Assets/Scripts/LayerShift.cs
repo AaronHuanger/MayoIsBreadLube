@@ -35,12 +35,12 @@ public class Game : MonoBehaviour
     }
 
     void switchCheck(){
-        if (Input.GetKey("q") && (layerNum+1 < grid.childCount)){ // move layer up
+        if (Input.GetKeyDown("q") && (layerNum+1 < grid.childCount)){ // move layer up
             Debug.Log("q was pressed");
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
             layerNum++;
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
-        }else if(Input.GetKey("e") && (layerNum-1 >= 0)){ //move layer down 
+        }else if(Input.GetKeyDown("e") && (layerNum-1 >= 0)){ //move layer down 
             Debug.Log("e was pressed");
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
             layerNum--;
