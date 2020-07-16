@@ -25,7 +25,7 @@ public class LayerControl : MonoBehaviour
         xCount = bounds.xMin; // test variable for LateUpdate test
         yCount = bounds.yMin; // test variable for LateUpdate test
 
-        //makeBoard();
+        makeBoard();
 
         //Note - the offset value of the x and y is the minValues of the bound of the x and y's
         // add the minBounds when you want to go from tileMap to array and subtract the minBound from the index of the array when going from array to tilemap positions.
@@ -35,7 +35,7 @@ public class LayerControl : MonoBehaviour
 
 
     // a test function to help visual the filling ni of the board. 
-    void LateUpdate() 
+    /*void LateUpdate() 
     {
         //if(Input.GetKeyDown("f")){
         if(Input.GetKey("f")){
@@ -57,7 +57,7 @@ public class LayerControl : MonoBehaviour
                 yCount = bounds.yMin;
             }
         }
-    }
+    }*/
 
     public static BoundsInt getTightBounds(Tilemap curMap){
         int minX = int.MaxValue;
@@ -83,13 +83,27 @@ public class LayerControl : MonoBehaviour
 
 //make board function 
     public void makeBoard(){ // makes the board at the spot except for existing tiles
-        Vector3Int tilePos;
-        for(int i = bounds.xMin; i < bounds.size.x - Mathf.Abs(bounds.xMin); i++){
-            for(int j = bounds.yMin; j < bounds.size.y - Mathf.Abs(bounds.yMin); j++){
-                tilePos = new Vector3Int(i,j,0);
+        /*Vector3Int tilePos;
+        for(int i = bounds.yMin; i < bounds.yMax; i++){
+            for(int j = bounds.xMin; j < bounds.xMax; j++){
+                tilePos = new Vector3Int(j,i,0);
                 if(!curMap.HasTile(tilePos)){
                     curMap.SetTile(tilePos,testTile);
                 }
+            }
+        }*/
+        while(yCount <= (bounds.size.y - Mathf.Abs(bounds.yMin))){
+            Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
+            if(curMap.GetComponent<TilemapRenderer>().enabled){
+                if(!curMap.HasTile(tilePos)){
+                    curMap.SetTile(tilePos,testTile);
+                }
+            }
+            xCount++;
+            if(xCount > (bounds.size.x - Mathf.Abs(bounds.xMin))){
+            //if(xCount > xMax){
+                xCount = bounds.xMin;
+                yCount++;
             }
         }
     }
