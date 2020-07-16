@@ -96,13 +96,13 @@ public class LayerControl : MonoBehaviour
 
         xCount = bounds.xMin;
         yCount = bounds.yMin;
-        while(yCount <= (bounds.size.y - Mathf.Abs(bounds.yMin))){
+        while(yCount <= bounds.yMax){
             Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
             if(!curMap.HasTile(tilePos)){
                 curMap.SetTile(tilePos,testTile);
             }
             xCount++;
-            if(xCount > (bounds.size.x - Mathf.Abs(bounds.xMin))){
+            if(xCount > bounds.xMax){
                 xCount = bounds.xMin;
                 yCount++;
             }
