@@ -22,8 +22,8 @@ public class LayerControl : MonoBehaviour
         //curMap.ResizeBounds(); // resizes the bounds to fit the existing tiles. Resize based on size and origin of the tilemap
         //Note: no need to resize the bounds of the tilemap. Wasn't possible to do so anyways. 
 
-        xCount = bounds.xMin; // test variable for LateUpdate test
-        yCount = bounds.yMin; // test variable for LateUpdate test
+        //xCount = bounds.xMin; // test variable for LateUpdate test
+        //yCount = bounds.yMin; // test variable for LateUpdate test
 
         makeBoard();
 
@@ -92,6 +92,9 @@ public class LayerControl : MonoBehaviour
                 }
             }
         }*/
+
+        xCount = bounds.xMin;
+        yCount = bounds.yMin;
         while(yCount <= (bounds.size.y - Mathf.Abs(bounds.yMin))){
             Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
             if(curMap.GetComponent<TilemapRenderer>().enabled){
@@ -101,7 +104,6 @@ public class LayerControl : MonoBehaviour
             }
             xCount++;
             if(xCount > (bounds.size.x - Mathf.Abs(bounds.xMin))){
-            //if(xCount > xMax){
                 xCount = bounds.xMin;
                 yCount++;
             }
