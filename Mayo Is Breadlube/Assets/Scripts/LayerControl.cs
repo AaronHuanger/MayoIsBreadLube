@@ -83,6 +83,7 @@ public class LayerControl : MonoBehaviour
 
 //make board function 
     public void makeBoard(){ // makes the board at the spot except for existing tiles
+
         /*Vector3Int tilePos;
         for(int i = bounds.yMin; i < bounds.yMax; i++){
             for(int j = bounds.xMin; j < bounds.xMax; j++){
@@ -97,10 +98,8 @@ public class LayerControl : MonoBehaviour
         yCount = bounds.yMin;
         while(yCount <= (bounds.size.y - Mathf.Abs(bounds.yMin))){
             Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
-            if(curMap.GetComponent<TilemapRenderer>().enabled){
-                if(!curMap.HasTile(tilePos)){
-                    curMap.SetTile(tilePos,testTile);
-                }
+            if(!curMap.HasTile(tilePos)){
+                curMap.SetTile(tilePos,testTile);
             }
             xCount++;
             if(xCount > (bounds.size.x - Mathf.Abs(bounds.xMin))){
