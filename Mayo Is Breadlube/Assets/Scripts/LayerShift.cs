@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class Game : MonoBehaviour
+public class LayerShift : MonoBehaviour
 {
     public Transform grid;
     public static Transform[] gridMaps; //stores the tile maps of the grid object 
@@ -22,7 +22,6 @@ public class Game : MonoBehaviour
             gridMaps[i] = grid.GetChild(i);
             gridMaps[i].GetComponent<TilemapRenderer>().enabled = false;
             //gridMaps[i].gameObject.SetActive(false);
-            Debug.Log(gridMaps[i].gameObject.name);
             //gridMaps[i].GetComponent<Tilemap>().ClearAllTiles();
         }
         layerNum = gridMaps.Length/2;
@@ -36,12 +35,10 @@ public class Game : MonoBehaviour
 
     void switchCheck(){
         if (Input.GetKeyDown("q") && (layerNum+1 < grid.childCount)){ // move layer up
-            Debug.Log("q was pressed");
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
             layerNum++;
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
         }else if(Input.GetKeyDown("e") && (layerNum-1 >= 0)){ //move layer down 
-            Debug.Log("e was pressed");
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
             layerNum--;
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;

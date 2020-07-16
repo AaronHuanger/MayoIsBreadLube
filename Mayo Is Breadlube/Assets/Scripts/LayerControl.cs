@@ -22,10 +22,10 @@ public class LayerControl : MonoBehaviour
         //curMap.ResizeBounds(); // resizes the bounds to fit the existing tiles. Resize based on size and origin of the tilemap
         //Note: no need to resize the bounds of the tilemap. Wasn't possible to do so anyways. 
 
-        xCount = bounds.xMin;
-        yCount = bounds.yMin;
+        xCount = bounds.xMin; // test variable for LateUpdate test
+        yCount = bounds.yMin; // test variable for LateUpdate test
 
-        makeBoard();
+        //makeBoard();
 
         //Note - the offset value of the x and y is the minValues of the bound of the x and y's
         // add the minBounds when you want to go from tileMap to array and subtract the minBound from the index of the array when going from array to tilemap positions.
@@ -35,13 +35,15 @@ public class LayerControl : MonoBehaviour
 
 
     // a test function to help visual the filling ni of the board. 
-    /*void LateUpdate() 
+    void LateUpdate() 
     {
         //if(Input.GetKeyDown("f")){
         if(Input.GetKey("f")){
             Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
             if(curMap.GetComponent<TilemapRenderer>().enabled){
-                curMap.SetTile(tilePos,testTile);
+                if(!curMap.HasTile(tilePos)){
+                    curMap.SetTile(tilePos,testTile);
+                }
             }
             xCount++;
             if(xCount > (tiles.GetLength(0) - Mathf.Abs(bounds.xMin))){
@@ -55,7 +57,7 @@ public class LayerControl : MonoBehaviour
                 yCount = bounds.yMin;
             }
         }
-    }*/
+    }
 
     public static BoundsInt getTightBounds(Tilemap curMap){
         int minX = int.MaxValue;
@@ -66,7 +68,7 @@ public class LayerControl : MonoBehaviour
         BoundsInt bounds = new BoundsInt();
         for(int i = curMap.cellBounds.xMin; i < curMap.cellBounds.xMax; i++){
             for(int j = curMap.cellBounds.yMin; j < curMap.cellBounds.yMax;j++){
-                tempVec = new Vector3Int(i,j,1); // contains the position of the tilemap. Z position is 1 because you don't want it to overlap with the tile walls.
+                tempVec = new Vector3Int(i,j,0); // contains the position of the tilemap. 
                 if(curMap.HasTile(tempVec)){ //check the position
                     minX = Mathf.Min(minX, tempVec.x);
                     maxX = Mathf.Max(maxX, tempVec.x);
@@ -82,9 +84,9 @@ public class LayerControl : MonoBehaviour
 //make board function 
     public void makeBoard(){ // makes the board at the spot except for existing tiles
         Vector3Int tilePos;
-        for(int i = bounds.xMin; i < bounds.xMax; i++){
-            for(int j = bounds.yMin; j < bounds.yMax; j++){
-                tilePos = new Vector3Int(i,j,1); // z made to 1 so that the generated tiles don't overlap the walls.
+        for(int i = bounds.xMin; i < bounds.size.x - Mathf.Abs(bounds.xMin); i++){
+            for(int j = bounds.yMin; j < bounds.size.y - Mathf.Abs(bounds.yMin); j++){
+                tilePos = new Vector3Int(i,j,0);
                 if(!curMap.HasTile(tilePos)){
                     curMap.SetTile(tilePos,testTile);
                 }
