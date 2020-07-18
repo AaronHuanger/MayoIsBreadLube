@@ -1,7 +1,9 @@
-using System.Collections;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
+using UnityEngine.UI;
+using UnityEngine.EventSystems;
+
 
 // Grid class 
 public class Grid<T> 
@@ -19,7 +21,7 @@ public class Grid<T>
     private Vector3 originPosition;
     private T[,] gridRepresentation; // Array of whatever it is we want, could be as simple as bools or as complicated as our own data types. 
  
-    public Grid(int width, int height, float cellSize, Vector3 originPosition, System.Func<T> defaultObject) // constructor for our gird class. Given the fact that we dont know
+    public Grid(int width, int height, float cellSize, Vector3 originPosition, Func<Grid<T>, int, int, T> defaultObject) // constructor for our gird class. Given the fact that we dont know
     {                                                                                                        // what T is, we can pass a function that gives us the default value of that type.
         this.width = width;
         this.height = height;
@@ -32,23 +34,28 @@ public class Grid<T>
         {
             for(int y = 0; y < gridRepresentation.GetLength(1); y++)
             {
-               gridRepresentation[x,y] = defaultObject(); // fill our grid with the default object for whatever type we are using.
-            }
+               gridRepresentation[x,y] = defaultObject(this, x, y); // fill our grid with the default object for whatever type we are using.
+            } // This way of doing things should probably be changed, we should just keep the default func as Func<T>, and instead have the T subscribe to an event in order to by pass all these refs.
         }
 
-
-        for(int x = 0; x < gridRepresentation.GetLength(0); x++)
-        {
-            for(int y = 0; y < gridRepresentation.GetLength(1); y++)
+        bool showDebug = true;
+        if(showDebug) {
+            TextMesh[,] debugTextArray = new TextMesh[width, height];
+            for(int x = 0; x < gridRepresentation.GetLength(0); x++)
             {
-                Debug.DrawLine(WorldPosition(x,y), WorldPosition(x, y+1),Color.white,100f); // by offsetting it by half of the cell size 
-                Debug.DrawLine(WorldPosition(x,y), WorldPosition(x+1,y),Color.white,100f);
+                for(int y = 0; y < gridRepresentation.GetLength(1); y++)
+                {
+                    debugTextArray[x,y] = CreateWorldText(x.ToString() + "," +  y.ToString(), null, WorldPosition(x,y) + new Vector3(cellSize, 0), 15, Color.white, TextAnchor.MiddleCenter);
+                    Debug.DrawLine(WorldPosition(x,y), WorldPosition(x, y+1),Color.white,100f); // by offsetting it by half of the cell size 
+                    Debug.DrawLine(WorldPosition(x,y), WorldPosition(x+1,y),Color.white,100f);
+                }
             }
-        }
-        Debug.DrawLine(WorldPosition(0,height), WorldPosition(width,height),Color.white,100f);
-        Debug.DrawLine(WorldPosition(width,0), WorldPosition(width,height),Color.white,100f);
-    }
+            Debug.DrawLine(WorldPosition(0,height), WorldPosition(width,height),Color.white,100f);
+            Debug.DrawLine(WorldPosition(width,0), WorldPosition(width,height),Color.white,100f);
 
+            //OnGridObjectChange +=  (object sender, OnGridObjectChangeEventArgs eventArgs) =>  {} here is the function that would handle our event everytime we call it if we need one.
+        }
+    }
     public int getWidth()
     {
         return width;
@@ -74,6 +81,7 @@ public class Grid<T>
         if(x >=0 && y >=0 && x <= width && y <= height)
         {
             gridRepresentation[x,y] = myObject;
+            if(OnGridObjectChange != null) OnGridObjectChange(this, new OnGridObjectChangeEventArgs{x = x, y = y });
         }
     }
 
@@ -113,5 +121,28 @@ public class Grid<T>
         y = Mathf.FloorToInt((worldPosition - originPosition).y/cellSize);
 
     }   
-    
+
+    public static TextMesh CreateWorldText(string text, Transform parent = null, Vector3 localPosition = default(Vector3), int fontSize = 5, Color? color = null, TextAnchor textAnchor = TextAnchor.UpperLeft, TextAlignment textAlignment = TextAlignment.Left, int sortingOrder = 5000) 
+    {
+            if (color == null) color = Color.white;
+            return CreateWorldText(parent, text, localPosition, fontSize, (Color)color, textAnchor, textAlignment, sortingOrder);
+    }
+        
+    // Create Text in the World
+    public static TextMesh CreateWorldText(Transform parent, string text, Vector3 localPosition, int fontSize, Color color, TextAnchor textAnchor, TextAlignment textAlignment, int sortingOrder) 
+    {
+        GameObject gameObject = new GameObject("World_Text", typeof(TextMesh));
+        Transform transform = gameObject.transform;
+        transform.SetParent(parent, false);
+        transform.localPosition = localPosition;
+        TextMesh textMesh = gameObject.GetComponent<TextMesh>();
+        textMesh.anchor = textAnchor;
+        textMesh.alignment = textAlignment;
+        textMesh.text = text;
+        textMesh.fontSize = fontSize;
+        textMesh.color = color;
+        textMesh.GetComponent<MeshRenderer>().sortingOrder = sortingOrder;
+        textMesh.characterSize = 0.1f; 
+        return textMesh;
+    }
 }
