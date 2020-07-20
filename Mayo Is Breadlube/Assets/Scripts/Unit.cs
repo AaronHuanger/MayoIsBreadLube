@@ -6,6 +6,7 @@ public class Unit : MonoBehaviour
 {
     final float pierceMult = 2.5;
     final float bluntMult = 1.3;
+    final float damageCap = 99999;
     public int actionPoints;
     public int maxHp;
     public int maxArmor;
@@ -33,9 +34,27 @@ public class Unit : MonoBehaviour
         if(damage.type = "pierce"){
             if(armor > 0){
                 int calcArmor = damage.value / (hpMult * pierceMult);
-                int remainder = damage.value- calcArmor;
-                armor = mathf.Clamp((calcArmor - damage.value) * (hpMult * pierceMult), 0, maxArmor);
+                int remainder = mathf.Clamp(damage.value - calcArmor, 0, damageCap);
 
+                armor = mathf.Clamp((calcArmor - damage.value) * (hpMult * pierceMult), 0, maxArmor);
+                health = mathf.Clamp(health - remainder, 0, maxHp);
+            }else{
+                health = mathf.Clamp(health - damage.value, 0, maxHp);
+            }
+        }else if(damage.type = "blunt"){
+            if(armor > 0){
+                int remainder = mathf.Clamp(damage.value - armor, 0, damageCap);
+
+                armor = mathf.Clamp(armor - damage.value, 0, maxArmor);
+                health = mathf.Clamp(health - (remainder * bluntMult), 0, maxHp);
+            }else{
+                health = mathf.Clamp(health - damage.value, 0, maxHp);
+            }
+        }else if(damage.type = "normal"){
+            if(armor > 0){
+                int remainder = mathf.Clamp(damage.value - armor, 0, damageCap);
+                
+                armor = mathf.Clamp(armor - damage.value, 0, maxArmor);
                 health = mathf.Clamp(health - remainder, 0, maxHp);
             }else{
                 health = mathf.Clamp(health - damage.value, 0, maxHp);
