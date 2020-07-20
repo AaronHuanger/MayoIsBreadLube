@@ -5,7 +5,7 @@ using UnityEngine;
 //Class for layers - ex: sky, ground, underground 
 abstract public class Layer : MonoBehaviour
 {
-    public TileData[,] tileMap;
+    public MyTileData[,] tileMap;
     List<Player> players;
     List<Enemy> enemies; 
 }
