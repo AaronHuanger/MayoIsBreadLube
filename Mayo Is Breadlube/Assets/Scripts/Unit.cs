@@ -16,7 +16,8 @@ public class Unit : MonoBehaviour
 
     public bool guard;
     public bool parry;
-    public float hpMult;
+    public float generalMult;
+    public float reduceMult;
     public int atkMult;
 
     //public List<string> statuses;
@@ -30,35 +31,26 @@ public class Unit : MonoBehaviour
 
     public AbilityTree abilityTree;
 
-    public int takeNormalDamage(Damage damage){
+    public void takeDamage(Damage damage){
         if(damage.type = "pierce"){
-            if(armor > 0){
-                int calcArmor = damage.value / (hpMult * pierceMult);
-                int remainder = mathf.Clamp(damage.value - calcArmor, 0, damageCap);
-
-                armor = mathf.Clamp((calcArmor - damage.value) * (hpMult * pierceMult), 0, maxArmor);
-                health = mathf.Clamp(health - remainder, 0, maxHp);
-            }else{
-                health = mathf.Clamp(health - damage.value, 0, maxHp);
-            }
+            applyDamage(pierceMult, 1, generalMult, reduceMult);
         }else if(damage.type = "blunt"){
-            if(armor > 0){
-                int remainder = mathf.Clamp(damage.value - armor, 0, damageCap);
-
-                armor = mathf.Clamp(armor - damage.value, 0, maxArmor);
-                health = mathf.Clamp(health - (remainder * bluntMult), 0, maxHp);
-            }else{
-                health = mathf.Clamp(health - damage.value, 0, maxHp);
-            }
+            applyDamage(1, bluntMult, generalMult, reduceMult);
         }else if(damage.type = "normal"){
-            if(armor > 0){
-                int remainder = mathf.Clamp(damage.value - armor, 0, damageCap);
-                
-                armor = mathf.Clamp(armor - damage.value, 0, maxArmor);
-                health = mathf.Clamp(health - remainder, 0, maxHp);
-            }else{
-                health = mathf.Clamp(health - damage.value, 0, maxHp);
-            }
+            applyDamage(1, 1, generalMult, reduceMult);
+        }
+    }
+
+    public void applyDamage(float armorMult, float hpMult, float generalMult, float reduceMult){
+        totalArmorMult = generalMult * armorMult * reduceMult;
+        totalHealthMult = generalMult * hpMult * reduceMult;
+        if(armor > 0){
+            int calcArmor = damage.value / totalArmorMult;
+            int remainder = mathf.Clamp(damage.value - calcArmor, 0, damageCap);
+            armor = mathf.Clamp((calcArmor - damage.value) * totalArmorMult, 0, maxArmor);
+            health = mathf.Clamp(health - (remainder * totalHealthMult), 0, maxHp);
+        }else{
+            health = mathf.Clamp(health - (damage.value * totalHealthMult), 0, maxHp);
         }
     }
 }
