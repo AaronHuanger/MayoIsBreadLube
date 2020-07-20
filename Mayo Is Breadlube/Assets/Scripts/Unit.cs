@@ -32,6 +32,12 @@ public class Unit : MonoBehaviour
     public AbilityTree abilityTree;
 
     public void takeDamage(Damage damage){
+        //might need to make this check for all parry abilities active if there is more than one but lets simplify to just one for now
+        if(parry){
+            Ability parry = abilityTree.getAbility("Parry");
+            parry.activate(damage.source);
+        }
+
         if(damage.type = "pierce"){
             applyDamage(pierceMult, 1, generalMult, reduceMult);
         }else if(damage.type = "blunt"){
@@ -47,6 +53,7 @@ public class Unit : MonoBehaviour
         if(armor > 0){
             int calcArmor = damage.value / totalArmorMult;
             int remainder = mathf.Clamp(damage.value - calcArmor, 0, damageCap);
+
             armor = mathf.Clamp((calcArmor - damage.value) * totalArmorMult, 0, maxArmor);
             health = mathf.Clamp(health - (remainder * totalHealthMult), 0, maxHp);
         }else{
