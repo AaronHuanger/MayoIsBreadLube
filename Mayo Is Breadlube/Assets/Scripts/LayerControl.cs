@@ -8,22 +8,14 @@ public class LayerControl : MonoBehaviour
     public MyTileData[,] tiles; 
     public TileBase testTile;
     Tilemap curMap;
-    BoundsInt bounds;
-    int xCount;
-    int yCount;
+    private BoundsInt bounds;
+
     // Start is called before the first frame update
     void Start()
     {
         curMap = GetComponent<Tilemap>(); // gets the tilemap that this script is attached to 
 
         bounds = getTightBounds(curMap);
-        //curMap.size = bounds.size;
-        //curMap.origin = new Vector3Int((bounds.xMax + bounds.xMin)/2 , (bounds.yMax + bounds.yMin)/2, 0); //adjusts the origin of the tilemap so that it is centered on the square.
-        //curMap.ResizeBounds(); // resizes the bounds to fit the existing tiles. Resize based on size and origin of the tilemap
-        //Note: no need to resize the bounds of the tilemap. Wasn't possible to do so anyways. 
-
-        //xCount = bounds.xMin; // test variable for LateUpdate test
-        //yCount = bounds.yMin; // test variable for LateUpdate test
 
         makeBoard();
 
@@ -33,31 +25,13 @@ public class LayerControl : MonoBehaviour
         tiles = new MyTileData[bounds.size.x, bounds.size.y]; // creates an array of tiles based on the map
     }
 
-
-    // a test function to help visual the filling ni of the board. 
-    /*void LateUpdate() 
-    {
-        //if(Input.GetKeyDown("f")){
-        if(Input.GetKey("f")){
-            Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
-            if(curMap.GetComponent<TilemapRenderer>().enabled){
-                if(!curMap.HasTile(tilePos)){
-                    curMap.SetTile(tilePos,testTile);
-                }
-            }
-            xCount++;
-            if(xCount > (tiles.GetLength(0) - Mathf.Abs(bounds.xMin))){
-            //if(xCount > xMax){
-                xCount = bounds.xMin;
-                yCount++;
-            }
-            
-            if(yCount > (tiles.GetLength(1) - Mathf.Abs(bounds.yMin))){
-            //if(yCount > yMax){
-                yCount = bounds.yMin;
-            }
-        }
-    }*/
+    public BoundsInt getBounds(){
+        return bounds;
+    }
+    
+    public void setBounds(BoundsInt newBound){
+        bounds = newBound;
+    }
 
     public static BoundsInt getTightBounds(Tilemap curMap){
         int minX = int.MaxValue;
@@ -84,21 +58,12 @@ public class LayerControl : MonoBehaviour
 //make board function 
     public void makeBoard(){ // makes the board at the spot except for existing tiles
 
-        /*Vector3Int tilePos;
-        for(int i = bounds.yMin; i < bounds.yMax; i++){
-            for(int j = bounds.xMin; j < bounds.xMax; j++){
-                tilePos = new Vector3Int(j,i,0);
-                if(!curMap.HasTile(tilePos)){
-                    curMap.SetTile(tilePos,testTile);
-                }
-            }
-        }*/
-
-        xCount = bounds.xMin;
-        yCount = bounds.yMin;
+        int xCount = bounds.xMin;
+        int yCount = bounds.yMin;
         while(yCount <= bounds.yMax){
             Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
             if(!curMap.HasTile(tilePos)){
+                //curMap.SetTileFlags(tilePos, TileFlags.None);
                 curMap.SetTile(tilePos,testTile);
             }
             xCount++;
