@@ -2,60 +2,82 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+// WARNING: Lot of comments because id rather you read this, or this article https://www.raywenderlich.com/3016-introduction-to-a-pathfinding than me explain from the ground up in call.
+
 public class PathFinding : MonoBehaviour
 {
-    private const int MOVE_STRAIGHT_COST = 10;
-   // private const int MOVE_DIAGONAL_COST = 14;
-    PathNode[,] grid;
-    private List<PathNode> openList;
+    // Because working with decimals is wonky in our algorithm instead of costing one point to move a tile we scale it up so it cost 10.
+    // However since we dont have diagonal  movement, which usually cost 1.4 or 14 if we scale, we dont techinally need this.
+    private const int MOVE_STRAIGHT_COST = 10;                            
+    PathNode[,] grid; 
+    // We need two list for this algorithm, and openlist for all the nodes we havent checked and a closed list for the ones we have
+    private List<PathNode> openList; 
     private List<PathNode> closedList;
     
-    void Start()
+    // We first need to get our path node array, which will have the array with the appropriate bounds. 
+    void Start() 
     {
         grid = GetComponent<LayerControl>().pathNodes;  
     }
 
+
+    
     public List<PathNode> FindPath(int startX, int startY, int endX, int endY)
     {
-        Debug.Log("test");
-        PathNode startNode = grid[startX, startY];
-        PathNode endNode = grid[endX, endY];
+        // Our beginning node is of course whatever tile we begin at, Same with our end node.
+        PathNode startNode = grid[startX, startY]; 
+        PathNode endNode = grid[endX, endY]; 
         
-
-        openList = new List<PathNode> { startNode };
+        // Our open list starts with the start node, and the algorithm will work from this starting point.
+         // Our closed list is of course empty at first.
+        openList = new List<PathNode> { startNode }; 
         closedList = new List<PathNode>();
 
-        for(int x = 0; x < grid.GetLength(0); x++)
-        {
+        // Even though we may have already created an array of pathnodes with appropriate x,y values in our layer control
+        // calculations in the h, f, and g cost change for a given start and end node, so we need to reset the board appropriately.
+        for(int x = 0; x < grid.GetLength(0); x++) 
+        {                                           
             for(int y = 0; y < grid.GetLength(1); y++)
             {
                 
                 PathNode pathNode = grid[x,y];
-                pathNode.gCost = int.MaxValue;
+                pathNode.gCost = int.MaxValue; 
                 pathNode.CalculateFCost();
                 pathNode.previousNode = null;
             }
         }
        
-        startNode.gCost = 0;
-        startNode.hCost = CalculateDistance(startNode, endNode);
-        startNode.CalculateFCost();
+        // The g cost is the cost it takes to go from the starting node to some other node following the path of adjacent nodes(or tiles). So 
+        // from the starting node, a node 3 nodes/tiles to the right of the starting node would have a g cost of 30. 
+        startNode.gCost = 0;   
+        // Our h cost is pretty much the opposite, the cost of getting from some node to the end node.
+        startNode.hCost = CalculateDistance(startNode, endNode); 
+        // The f cost is simply the sum of these two cost.
+        startNode.CalculateFCost(); 
 
-        while(openList.Count > 0)
+        // While our list has nodes to check, check those nodes for a possible path.
+        while(openList.Count > 0) 
         {
-            PathNode currentNode = GetLowestFCost(openList);
-            openList.Remove(currentNode);
+            // We first look at our list of open nodes and get the one with the lowest f cost to check first
+            // We remove it from our open list and put it in our close list since we are checking it.
+            PathNode currentNode = GetLowestFCost(openList); 
+            openList.Remove(currentNode); 
             closedList.Add(currentNode);
 
-            if(currentNode == endNode)
+            // If our current node is our end node, then we have found our path, its easier to see why this is the case visually. 
+            if(currentNode == endNode) 
             {
                 //Reached the final node
                 return CalculatePath(startNode, endNode);
             } 
 
-            foreach(PathNode neighbourNode in GetNeighbourList(currentNode))
+            // For each neighbor node to the current node we do a couple things.
+            // If our neighbor node has already been checked, just continue going through the neighbors list
+            // If the node is unwalkable go ahead and add it to the close list and continue.
+            // Other wise we do the last if check which is hard to explain without visuals, so if you have question ask me directly or implement the algorithm for yourself to find out!
+            foreach(PathNode neighbourNode in GetNeighbourList(currentNode)) 
             {
-                if(closedList.Contains(neighbourNode)) continue;
+                if(closedList.Contains(neighbourNode)) continue; 
                 if(!currentNode.walkableTile) 
                 { 
                     closedList.Add(currentNode);
@@ -63,12 +85,10 @@ public class PathFinding : MonoBehaviour
                 }
 
                 int newMovementCost = currentNode.gCost + CalculateDistance(currentNode, neighbourNode);
-              //  Debug.Log("Currently in (" + currentNode.x  + " , " + currentNode.y + ")");
-                if(newMovementCost < neighbourNode.gCost || !openList.Contains(neighbourNode))
-                {
-                    
-                    neighbourNode.previousNode = currentNode;
-                    neighbourNode.gCost = newMovementCost;
+                if(newMovementCost < neighbourNode.gCost || !openList.Contains(neighbourNode)) 
+                {                                        
+                    neighbourNode.previousNode = currentNode; 
+                    neighbourNode.gCost = newMovementCost; 
                     neighbourNode.hCost = CalculateDistance(neighbourNode, endNode);
                     neighbourNode.CalculateFCost();
 
@@ -84,7 +104,8 @@ public class PathFinding : MonoBehaviour
         return null;
     }
 
-    private List<PathNode> GetNeighbourList(PathNode currentNode)
+    // This will be optomized later with a binary tree, but right now getting the neighbours is straightforward.
+    private List<PathNode> GetNeighbourList(PathNode currentNode)  
     {
         List<PathNode> neighbourList = new List<PathNode>();
 
@@ -105,9 +126,11 @@ public class PathFinding : MonoBehaviour
         return grid[x,y];
     }
 
-    private List<PathNode> CalculatePath(PathNode startNode, PathNode endNode)
-    {
-        List<PathNode> path =  new List<PathNode>();
+    // Since every node has a pointer to the node it came from, to get the path we simply 
+    // start from our end node, go all the way back to our start node, and then reverse the list for our correct path.
+    private List<PathNode> CalculatePath(PathNode startNode, PathNode endNode) 
+    {                                                                          
+        List<PathNode> path =  new List<PathNode>();                          
         PathNode currentNode = endNode;
         
         while(currentNode != startNode)
@@ -115,20 +138,18 @@ public class PathFinding : MonoBehaviour
             path.Add(currentNode);
             currentNode = currentNode.previousNode;
         }
-
+        path.Add(currentNode);
         path.Reverse();
         return path;
     }
 
+    // Basic algebra for distances between two points.
     private int CalculateDistance(PathNode a, PathNode b)
     {
-      /*  int xDistance = Mathf.Abs(a.x - b.x);
-        int yDistance = Mathf.Abs(a.y - b.y);
-        int remaining = Mathf.Abs(xDistance - yDistance);
-        return Mathf.Min(xDistance, yDistance) + MOVE_STRAIGHT_COST * remaining;*/
-        return MOVE_STRAIGHT_COST * Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
+        return MOVE_STRAIGHT_COST * Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y); 
     }
 
+     // Simple using a loop to find the lowest value.
     private PathNode GetLowestFCost(List<PathNode> list)
     {
         PathNode loswestFCost = list[0];

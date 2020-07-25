@@ -8,6 +8,7 @@ public class LayerControl : MonoBehaviour
     public MyTileData[,] tiles; 
     public PathNode[,] pathNodes;
     public TileBase testTile;
+    public GameObject test;
     Tilemap curMap;
     public BoundsInt bounds;
     int xCount;
@@ -33,13 +34,14 @@ public class LayerControl : MonoBehaviour
         //ex: bounds.xMin and bounds.yMin. 
         tiles = new MyTileData[bounds.size.x, bounds.size.y]; // creates an array of tiles based on the map
         
-        // Ignore this, this is simply testing for the array of pathnodes in order to execute path finding.
+        // Ignore this, this is simply testing for the array of pathnodes in order to execute path finding. Theres probably a better place to do this but im lazy right now
+        // and just want to see if the algorithm even works.
         pathNodes = new PathNode[bounds.size.x, bounds.size.y]; 
       
         for(int i = 0; i < bounds.size.x; i++)
             for(int j = 0; j < bounds.size.y; j++)
             {
-                pathNodes[i,j] = new PathNode(i,j);
+                pathNodes[i,j] = new PathNode(i,j, bounds);
             }
     }
 
@@ -106,10 +108,11 @@ public class LayerControl : MonoBehaviour
 
         xCount = bounds.xMin;
         yCount = bounds.yMin;
+        
         while(yCount <= bounds.yMax){
             Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
             if(!curMap.HasTile(tilePos)){
-                curMap.SetTile(tilePos,testTile);
+                curMap.SetTile(tilePos, testTile);
             }
             xCount++;
             if(xCount > bounds.xMax){
