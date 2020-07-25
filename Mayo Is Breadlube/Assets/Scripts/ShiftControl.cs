@@ -37,6 +37,9 @@ public class ShiftControl : MonoBehaviour
         }
     }
 
+    // BIG WARNING
+    //EVERYTHING HERE IS ME FUCKING WITH CODE TO SEE IF IT WOULD WORK WITH THE SHIFT, THIS IS NOT THE FINAL IMPLEMENTATION OF THE PATH FINDING.
+
     void gridStart(){
         //stores tile maps into an array for later access. 
         int numChild = grid.childCount;
@@ -44,10 +47,14 @@ public class ShiftControl : MonoBehaviour
         for(int i = 0; i < numChild; i++){
             gridMaps[i] = grid.GetChild(i);
             gridMaps[i].GetComponent<TilemapRenderer>().enabled = false;
+            gridMaps[i].GetComponent<PathFinding>().enabled = false;
+            gridMaps[i].GetComponent<TestMovement>().enabled = false;
             hideChildren(gridMaps[i]);
         }
         layerNum = getLayerNum(startingPlayer.transform.parent);
         gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
+        gridMaps[layerNum].GetComponent<PathFinding>().enabled = true;
+        gridMaps[layerNum].GetComponent<TestMovement>().enabled = true;
         revealChildren(gridMaps[layerNum]);
     }
 
