@@ -6,13 +6,14 @@ using UnityEngine.Tilemaps;
 public class LayerControl : MonoBehaviour
 {
     public MyTileData[,] tiles; 
+    public PathNode[,] pathNodes;
     public TileBase testTile;
     Tilemap curMap;
-    BoundsInt bounds;
+    public BoundsInt bounds;
     int xCount;
     int yCount;
     // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
         curMap = GetComponent<Tilemap>(); // gets the tilemap that this script is attached to 
 
@@ -31,6 +32,15 @@ public class LayerControl : MonoBehaviour
         // add the minBounds when you want to go from tileMap to array and subtract the minBound from the index of the array when going from array to tilemap positions.
         //ex: bounds.xMin and bounds.yMin. 
         tiles = new MyTileData[bounds.size.x, bounds.size.y]; // creates an array of tiles based on the map
+        
+        // Ignore this, this is simply testing for the array of pathnodes in order to execute path finding.
+        pathNodes = new PathNode[bounds.size.x, bounds.size.y]; 
+      
+        for(int i = 0; i < bounds.size.x; i++)
+            for(int j = 0; j < bounds.size.y; j++)
+            {
+                pathNodes[i,j] = new PathNode(i,j);
+            }
     }
 
 
