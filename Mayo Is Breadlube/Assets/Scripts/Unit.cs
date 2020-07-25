@@ -12,10 +12,10 @@ public class Unit : MonoBehaviour
     public int armor;
 
     public bool guard;
-    public bool parry;
-    public float generalMult;
-    public float reduceMult;
-    public int atkMult;
+    public bool parry; //boolean here to make it faster to check
+    public float generalMult; //damage increase on this unit due to debuff or whatnot
+    public float reduceMult; //damage reduction on this unit due to guard or whatnot
+    public int atkMult; //buff or debuff on this units attacks
 
     //public List<string> statuses;
 
@@ -44,7 +44,7 @@ public class Unit : MonoBehaviour
         }
     }
 
-    public void applyDamage(Damage damage, float armorMult, float hpMult, float generalMult, float reduceMult){
+    private void applyDamage(Damage damage, float armorMult, float hpMult, float generalMult, float reduceMult){
         float totalArmorMult = generalMult * armorMult * reduceMult;
         float totalHealthMult = generalMult * hpMult * reduceMult;
         if(armor > 0){
