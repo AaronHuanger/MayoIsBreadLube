@@ -13,19 +13,45 @@ public class PathFinding : MonoBehaviour
     // We need two list for this algorithm, and openlist for all the nodes we havent checked and a closed list for the ones we have
     private List<PathNode> openList; 
     private List<PathNode> closedList;
+    private BoundsInt bounds;
     
     // We first need to get our path node array, which will have the array with the appropriate bounds. 
     void Start() 
     {
         grid = GetComponent<LayerControl>().pathNodes;  
+        bounds = GetComponent<LayerControl>().bounds;
     }
 
+    public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
+    {
+        GetXY(startWorldPosition, out int startX, out int startY);
+        GetXY(endWorldPosition, out int endX, out int endY);
 
+        //Debug.Log("Start: " + startX + " , " + startY);
+        //Debug.Log("End: " + endX + " , " + endY);
+
+        List<PathNode> path = FindPath(startX, startY, endX, endY);
+        if(path == null)
+        {
+            return null;
+        }
+        else 
+        {
+             List<Vector3> vectorPath = new List<Vector3>();
+             foreach(PathNode pathNode in path)
+             {
+                 vectorPath.Add(new Vector3(pathNode.isometricCoordinates.x, pathNode.isometricCoordinates.y + 0.25f));
+                 Debug.Log("Isometric Coordinates: " + pathNode.isometricCoordinates.x + " , " + pathNode.isometricCoordinates.y);
+             }
+             return vectorPath; 
+        }
+
+    }
     
     public List<PathNode> FindPath(int startX, int startY, int endX, int endY)
     {
         // Our beginning node is of course whatever tile we begin at, Same with our end node.
-        PathNode startNode = grid[startX, startY]; 
+        PathNode startNode = grid[startX, startY];
         PathNode endNode = grid[endX, endY]; 
         
         // Our open list starts with the start node, and the algorithm will work from this starting point.
@@ -160,4 +186,22 @@ public class PathFinding : MonoBehaviour
         }
         return loswestFCost;
     }
+
+    public void GetXY (Vector3 worldPosition, out int x, out int y) 
+    {
+        float tempx;
+        float calcX, calcY;
+        calcX = (bounds.xMin - bounds.yMin) * 0.5f;
+        calcY = (bounds.xMin + bounds.yMin) * 0.25f;
+      
+        Vector3 originPosition = new Vector3(calcX, calcY);
+        worldPosition = (worldPosition - originPosition) / 0.5f;
+        tempx = worldPosition.x;
+        worldPosition.x = (2.0f * worldPosition.y + worldPosition.x) * 0.5f;
+        worldPosition.y = (2.0f * worldPosition.y - tempx) * 0.5f;
+        
+        x = Mathf.FloorToInt(worldPosition.x);
+        y = Mathf.FloorToInt(worldPosition.y);
+        
+    }  
 }

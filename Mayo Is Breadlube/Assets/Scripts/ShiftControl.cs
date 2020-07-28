@@ -48,13 +48,11 @@ public class ShiftControl : MonoBehaviour
             gridMaps[i] = grid.GetChild(i);
             gridMaps[i].GetComponent<TilemapRenderer>().enabled = false;
             gridMaps[i].GetComponent<PathFinding>().enabled = false;
-            gridMaps[i].GetComponent<TestMovement>().enabled = false;
             hideChildren(gridMaps[i]);
         }
         layerNum = getLayerNum(startingPlayer.transform.parent);
         gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
         gridMaps[layerNum].GetComponent<PathFinding>().enabled = true;
-        gridMaps[layerNum].GetComponent<TestMovement>().enabled = true;
         revealChildren(gridMaps[layerNum]);
     }
 
@@ -72,22 +70,18 @@ public class ShiftControl : MonoBehaviour
         if (Input.mouseScrollDelta.y > 0 && (layerNum+1 < grid.childCount)){ // move layer up
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
             gridMaps[layerNum].GetComponent<PathFinding>().enabled = false;
-            gridMaps[layerNum].GetComponent<TestMovement>().enabled = false;
             hideChildren(gridMaps[layerNum]);
             layerNum++;
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
             gridMaps[layerNum].GetComponent<PathFinding>().enabled = true;
-            gridMaps[layerNum].GetComponent<TestMovement>().enabled = true;
             revealChildren(gridMaps[layerNum]);
         }else if(Input.mouseScrollDelta.y < 0 && (layerNum-1 >= 0)){ //move layer down 
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
             gridMaps[layerNum].GetComponent<PathFinding>().enabled = false;
-            gridMaps[layerNum].GetComponent<TestMovement>().enabled = false;
             hideChildren(gridMaps[layerNum]);
             layerNum--;
             gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
             gridMaps[layerNum].GetComponent<PathFinding>().enabled = true;
-            gridMaps[layerNum].GetComponent<TestMovement>().enabled = true;
             revealChildren(gridMaps[layerNum]);
         }
     }

@@ -36,10 +36,10 @@ public class LayerControl : MonoBehaviour
         
         // Ignore this, this is simply testing for the array of pathnodes in order to execute path finding. Theres probably a better place to do this but im lazy right now
         // and just want to see if the algorithm even works.
-        pathNodes = new PathNode[bounds.size.x, bounds.size.y]; 
+        pathNodes = new PathNode[bounds.size.x + 1, bounds.size.y + 1]; 
       
-        for(int i = 0; i < bounds.size.x; i++)
-            for(int j = 0; j < bounds.size.y; j++)
+        for(int i = 0; i < bounds.size.x + 1; i++)
+            for(int j = 0; j < bounds.size.y + 1; j++)
             {
                 pathNodes[i,j] = new PathNode(i,j, bounds);
             }
@@ -108,7 +108,6 @@ public class LayerControl : MonoBehaviour
 
         xCount = bounds.xMin;
         yCount = bounds.yMin;
-        
         while(yCount <= bounds.yMax){
             Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
             if(!curMap.HasTile(tilePos)){
