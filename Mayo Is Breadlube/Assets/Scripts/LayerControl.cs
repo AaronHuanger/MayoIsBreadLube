@@ -42,6 +42,7 @@ public class LayerControl : MonoBehaviour
             for(int j = 0; j < bounds.size.y + 1; j++)
             {
                 pathNodes[i,j] = new PathNode(i,j, bounds);
+                pathNodes[i,j].walkableTile = true;
             }
     }
 

@@ -9,11 +9,12 @@ public class PathFinding : MonoBehaviour
     // Because working with decimals is wonky in our algorithm instead of costing one point to move a tile we scale it up so it cost 10.
     // However since we dont have diagonal  movement, which usually cost 1.4 or 14 if we scale, we dont techinally need this.
     private const int MOVE_STRAIGHT_COST = 10;                            
-    PathNode[,] grid; 
+    public PathNode[,] grid; 
     // We need two list for this algorithm, and openlist for all the nodes we havent checked and a closed list for the ones we have
     private List<PathNode> openList; 
     private List<PathNode> closedList;
     private BoundsInt bounds;
+    
     
     // We first need to get our path node array, which will have the array with the appropriate bounds. 
     void Start() 
@@ -27,9 +28,6 @@ public class PathFinding : MonoBehaviour
         GetXY(startWorldPosition, out int startX, out int startY);
         GetXY(endWorldPosition, out int endX, out int endY);
 
-        //Debug.Log("Start: " + startX + " , " + startY);
-        //Debug.Log("End: " + endX + " , " + endY);
-
         List<PathNode> path = FindPath(startX, startY, endX, endY);
         if(path == null)
         {
@@ -41,7 +39,6 @@ public class PathFinding : MonoBehaviour
              foreach(PathNode pathNode in path)
              {
                  vectorPath.Add(new Vector3(pathNode.isometricCoordinates.x, pathNode.isometricCoordinates.y + 0.25f));
-                 Debug.Log("Isometric Coordinates: " + pathNode.isometricCoordinates.x + " , " + pathNode.isometricCoordinates.y);
              }
              return vectorPath; 
         }
@@ -50,6 +47,10 @@ public class PathFinding : MonoBehaviour
     
     public List<PathNode> FindPath(int startX, int startY, int endX, int endY)
     {
+        if(!hasPath(startX, startY, endX, endY))
+        {
+            return null;
+        }
         // Our beginning node is of course whatever tile we begin at, Same with our end node.
         PathNode startNode = grid[startX, startY];
         PathNode endNode = grid[endX, endY]; 
@@ -70,6 +71,7 @@ public class PathFinding : MonoBehaviour
                 pathNode.gCost = int.MaxValue; 
                 pathNode.CalculateFCost();
                 pathNode.previousNode = null;
+        
             }
         }
        
@@ -149,7 +151,18 @@ public class PathFinding : MonoBehaviour
 
     public PathNode GetNode(int x, int y)
     {
-        return grid[x,y];
+        if(!outOfBounds(x,y))
+            return grid[x,y];
+        else 
+            return null;
+    }
+
+    public bool outOfBounds(int x, int y)
+    {
+        if(x >= grid.GetLength(0) || x < 0 || y >= grid.GetLength(1) || y < 0)
+            return true;
+        else
+            return false;
     }
 
     // Since every node has a pointer to the node it came from, to get the path we simply 
@@ -202,6 +215,36 @@ public class PathFinding : MonoBehaviour
         
         x = Mathf.FloorToInt(worldPosition.x);
         y = Mathf.FloorToInt(worldPosition.y);
-        
     }  
+
+    public bool isWalkable(int x, int y)
+    {
+        if(outOfBounds(x,y))
+            return false;
+        if(grid[x,y].walkableTile)
+            return true;
+        else 
+         return false;
+    }
+
+    public bool hasPath(int startX, int startY, int endX, int endY)
+    {
+        if(endX >= grid.GetLength(0) || endX < 0 || endY >= grid.GetLength(1) || endY < 0)
+        {
+            return false;
+        }
+        else 
+            return true;
+    }
+
+    public Vector3 WorldPosition(int x, int y) 
+    {
+        float calcX, calcY;
+        calcX = (bounds.xMin - bounds.yMin) * 0.5f;
+        calcY = (bounds.xMin + bounds.yMin) * 0.25f;
+        Vector3 rotationCalculation;
+        
+        rotationCalculation =  new Vector3 ((x -y), (float)(y+x)/2);  
+        return rotationCalculation * 0.5f + new Vector3(calcX, calcY); 
+    }      
 }

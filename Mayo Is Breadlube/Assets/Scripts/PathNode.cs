@@ -18,7 +18,8 @@ public class PathNode
     // Variable to hold the node that came before this node, used for path finding calculation.
     public PathNode previousNode;
     // Variable to set whether tile is walkable.
-    public bool walkableTile;
+    public bool walkableTile = true;
+    public bool withinDistance = false;
 
 
     public PathNode(int x, int y, BoundsInt bounds)

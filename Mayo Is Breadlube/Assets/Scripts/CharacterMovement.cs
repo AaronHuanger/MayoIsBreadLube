@@ -1,27 +1,103 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+using UnityEngine.Tilemaps;
 public class CharacterMovement : MonoBehaviour
 {
     public float speed;
+    public int moveDistance;
     private int currentPathIndex;
     private PathFinding pathFinding;
     private List<Vector3> pathList = null;
+    private Tilemap tiles;
 
-    void Start()
+    private State state;
+    private enum State
+    {
+        Normal,
+        Waiting
+    }
+    private void Start()
     {
         Transform bodyTransform = GetComponent<Transform>();
         pathFinding = GetComponentInParent<PathFinding>();
+        tiles = GetComponentInParent<Tilemap>();
+        state = State.Normal;
     }
 
+    // First in order to be able to display our possible moves were gonna need to check within a radius of our unit before hand and use our path finding to see if the move is valid.
+    // since we have the pathfinding component already we can use our GetXY function to help sort out where we can move before hand.
+    private void UpdateMovePosition()
+    {
+        int unitX = 0;
+        int unitY = 0;
+        pathFinding.GetXY(GetPosition(), out unitX, out unitY);
+        for(int x = 0; x < pathFinding.grid.GetLength(0); ++x)
+            for(int y = 0; y < pathFinding.grid.GetLength(1); ++y)
+                pathFinding.GetNode(x,y).withinDistance = false;
+
+        Debug.Log("Current Position: " + unitX + ", " + unitY);
+        for(int x = unitX - moveDistance; x <= unitX + moveDistance; x++)
+        {
+            for(int y = unitY - moveDistance; y <= unitY + moveDistance; y++)
+            {
+                if(pathFinding.GetNode(x,y) == null)
+                    continue;
+                if(pathFinding.isWalkable(x,y))
+                {
+                    if(pathFinding.hasPath(unitX, unitY, x, y))
+                    {
+                        if(pathFinding.FindPath(unitX, unitY, x, y).Count - 1 <= moveDistance)
+                        {
+                           // Debug.Log(pathFinding.FindPath(unitX, unitY, x, y).Count);
+                           // Debug.Log("Is within distance: (" + x + " , " + y + ")");
+                            pathFinding.GetNode(x,y).withinDistance = true;
+                            
+                        }
+                        else
+                        {
+                           // Debug.Log(pathFinding.FindPath(unitX, unitY, x, y).Count);
+                           // Debug.Log("Not within distance 1: (" + x + " , " + y + ")");
+                            pathFinding.GetNode(x,y).withinDistance = false;
+                            
+                        }
+                    }
+                }
+                else
+                {
+                    // Debug.Log(pathFinding.FindPath(unitX, unitY, x, y).Count);
+                    // Debug.Log("Not within distance 2: (" + x + " , " + y + ")");
+                    pathFinding.GetNode(x,y).withinDistance = false;
+                    
+                }
+            }
+        }
+    }
     // Update is called once per frame
     void Update()
     {
         Move();
-        if(Input.GetMouseButton(0))
+        switch(state)
         {
-            SetTargetPosition(GetMouseWorldPosition());
+            case State.Normal:
+                if(Input.GetMouseButton(0))
+                {
+                    UpdateMovePosition();
+                    pathFinding.GetXY(GetMouseWorldPosition(), out int x, out int y);
+                    Debug.Log("Mouse/Array Position: " + x + " , " + y);
+                    if(!pathFinding.outOfBounds(x,y)) 
+                    {
+                        if(pathFinding.GetNode(x,y).withinDistance)
+                        {   
+                            state = State.Waiting;
+                            SetTargetPosition(GetMouseWorldPosition());
+                            //UpdateMovePosition();
+                        }
+                    }
+                }
+                break;
+            case State.Waiting:
+                break;
         }
     }
 
@@ -39,8 +115,12 @@ public class CharacterMovement : MonoBehaviour
     {
         if(pathList != null)
         {
-            Vector3 targetPosition = pathList[currentPathIndex];
-            if(Vector3.Distance(transform.position, targetPosition) > 0.02f)
+            // We collect the next node/tile on the list to walk to.
+            Vector3 targetPosition = pathList[currentPathIndex]; 
+            // The distance from our position to the next position has to be atleast 0.02 units for the move to be valid. 
+            // If it is we just use a normal calculation to update its position, and if it isnt then were at the target node, in which case we increase our path index.
+            // Should our path index be equal to our path list count then were done with the list.
+            if(Vector3.Distance(transform.position, targetPosition) > 0.02f) 
             {
                 Vector3 moveDirection = (targetPosition - transform.position).normalized;
                 transform.position = transform.position + moveDirection * speed * Time.deltaTime;
@@ -51,9 +131,9 @@ public class CharacterMovement : MonoBehaviour
                 if(currentPathIndex >= pathList.Count)
                 {
                     pathList = null;
+                    state = State.Normal;
                 }
             }
-            
         }
     }
 
@@ -84,5 +164,6 @@ public class CharacterMovement : MonoBehaviour
         Vector3 worldPosition = worldCamera.ScreenToWorldPoint(screenPosition);
         return worldPosition;
     }
+
 
 }
