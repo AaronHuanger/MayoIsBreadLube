@@ -113,6 +113,7 @@ public class LayerControl : MonoBehaviour
             Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
             if(!curMap.HasTile(tilePos)){
                 curMap.SetTile(tilePos, testTile);
+                curMap.SetTileFlags(tilePos, TileFlags.None);
             }
             xCount++;
             if(xCount > bounds.xMax){

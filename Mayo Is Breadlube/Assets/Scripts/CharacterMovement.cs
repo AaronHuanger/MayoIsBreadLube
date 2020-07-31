@@ -6,10 +6,12 @@ public class CharacterMovement : MonoBehaviour
 {
     public float speed;
     public int moveDistance;
+    public TileBase testTile;
     private int currentPathIndex;
     private PathFinding pathFinding;
     private List<Vector3> pathList = null;
     private Tilemap tiles;
+    private Color originalColor;
 
     private State state;
     private enum State
@@ -22,19 +24,55 @@ public class CharacterMovement : MonoBehaviour
         Transform bodyTransform = GetComponent<Transform>();
         pathFinding = GetComponentInParent<PathFinding>();
         tiles = GetComponentInParent<Tilemap>();
+        originalColor = tiles.GetColor(new Vector3Int(0,0,0));
         state = State.Normal;
     }
 
     // First in order to be able to display our possible moves were gonna need to check within a radius of our unit before hand and use our path finding to see if the move is valid.
     // since we have the pathfinding component already we can use our GetXY function to help sort out where we can move before hand.
-    private void UpdateMovePosition()
+   
+    // Update is called once per frame
+    void Update()
+    {
+        Move();
+        switch(state)
+        {
+            case State.Normal:
+                if(Input.GetMouseButton(0))
+                {
+                    UpdateMovePosition();
+                    pathFinding.GetXY(GetMouseWorldPosition(), out int x, out int y);
+                    Debug.Log("Mouse/Array Position: " + x + " , " + y);
+                    if(!pathFinding.outOfBounds(x,y)) 
+                    {
+                        if(pathFinding.GetNode(x,y).withinDistance)
+                        {   
+                            state = State.Waiting;
+                            SetTargetPosition(GetMouseWorldPosition());
+                        }
+                    }
+                }
+                UpdateMovePosition();
+                break;
+            case State.Waiting:
+                break;
+        }
+    }
+
+
+     private void UpdateMovePosition()
     {
         int unitX = 0;
         int unitY = 0;
+        Vector3Int tilePos;
         pathFinding.GetXY(GetPosition(), out unitX, out unitY);
         for(int x = 0; x < pathFinding.grid.GetLength(0); ++x)
             for(int y = 0; y < pathFinding.grid.GetLength(1); ++y)
+            {
                 pathFinding.GetNode(x,y).withinDistance = false;
+                tilePos = pathFinding.TilePosition(x,y); 
+                tiles.SetColor(tilePos, originalColor);
+            }
 
         Debug.Log("Current Position: " + unitX + ", " + unitY);
         for(int x = unitX - moveDistance; x <= unitX + moveDistance; x++)
@@ -52,7 +90,8 @@ public class CharacterMovement : MonoBehaviour
                            // Debug.Log(pathFinding.FindPath(unitX, unitY, x, y).Count);
                            // Debug.Log("Is within distance: (" + x + " , " + y + ")");
                             pathFinding.GetNode(x,y).withinDistance = true;
-                            
+                            tilePos = pathFinding.TilePosition(x,y);   
+                            tiles.SetColor(tilePos, Color.green);
                         }
                         else
                         {
@@ -73,34 +112,6 @@ public class CharacterMovement : MonoBehaviour
             }
         }
     }
-    // Update is called once per frame
-    void Update()
-    {
-        Move();
-        switch(state)
-        {
-            case State.Normal:
-                if(Input.GetMouseButton(0))
-                {
-                    UpdateMovePosition();
-                    pathFinding.GetXY(GetMouseWorldPosition(), out int x, out int y);
-                    Debug.Log("Mouse/Array Position: " + x + " , " + y);
-                    if(!pathFinding.outOfBounds(x,y)) 
-                    {
-                        if(pathFinding.GetNode(x,y).withinDistance)
-                        {   
-                            state = State.Waiting;
-                            SetTargetPosition(GetMouseWorldPosition());
-                            //UpdateMovePosition();
-                        }
-                    }
-                }
-                break;
-            case State.Waiting:
-                break;
-        }
-    }
-
     void SetTargetPosition(Vector3 targetPosition)
     {
         currentPathIndex = 0;

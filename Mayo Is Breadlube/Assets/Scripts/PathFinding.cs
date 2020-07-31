@@ -246,5 +246,12 @@ public class PathFinding : MonoBehaviour
         
         rotationCalculation =  new Vector3 ((x -y), (float)(y+x)/2);  
         return rotationCalculation * 0.5f + new Vector3(calcX, calcY); 
-    }      
+    } 
+
+    public Vector3Int TilePosition(int x, int y)
+    {
+        Vector3Int holder;
+        holder = new Vector3Int(x  + bounds.xMin, y + bounds.yMin, 0);
+        return holder;
+    }     
 }
