@@ -2,8 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-
-abstract public class Levels : MonoBehaviour
+public class Level : MonoBehaviour
 {
-    List<Map> Maps; 
+    Transform[] maps;
+    public GameObject[] players;
+
+    void Awake(){
+        //gets player object from the entire scene
+        players = GameObject.FindGameObjectsWithTag("Player");
+        
+        //gets the map transform in this level
+        int numChild = transform.childCount;
+        maps = new Transform[numChild];
+        for(int i = 0; i < numChild; i++){
+            maps[i] = transform.GetChild(i);
+        }
+    }
+    public GameObject[] getPlayerGameObjects(){
+        return players;
+    }
 }

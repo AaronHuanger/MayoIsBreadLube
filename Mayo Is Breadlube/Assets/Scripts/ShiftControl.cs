@@ -1,95 +1,90 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
-public class ShiftControl : MonoBehaviour
+//shift controller for layers and players 
+class ShiftControl : MonoBehaviour
 {
-    public Transform grid;
-    public Transform[] gridMaps; //stores the tile maps of the grid object 
-    private Transform startingLayer;
-    int layerNum;
-        public GameObject[] players;
     public GameObject startingPlayer;
-    int playerNum;
+    public float fadeRate = 0.5f;
     public Color outline = UnityEngine.Color.red;
-    public float fadeRate = 0.5f;  
+
+
+    public Map map;    
+    Transform[] layers;
+    int layerNum;
+    GameObject[] players;
+    int playerNum;
     
-    //Controls: mouse scrollbar --> shifts layesr
-    //          shift + mouse scroll --> shifts player
+
+    // Start is called before the first frame update
     void Start()
     {   
-        gridStart();
-        playerStart();
-        
-    }
+        layers = map.getLayerTransforms(); // gets layers from map script
+        players = map.getPlayerGameObjects(); // gets players from map script
 
-    void Update(){
-        layerSwitch();
-        playerSwitch();
-    }
-
-    void errorCheck(){
-        /*if(!startingLayer.CompareTag("Layer")){
-            Debug.LogError("A Layer was not placed in startingLayer");
-        }*/
-        if(!startingPlayer.CompareTag("Player")){
-            Debug.LogError("A player was not placed in startingLayer");
-        }
-    }
-
-    void gridStart(){
-        //stores tile maps into an array for later access. 
-        int numChild = grid.childCount;
-        gridMaps = new Transform[numChild];
-        for(int i = 0; i < numChild; i++){
-            gridMaps[i] = grid.GetChild(i);
-            IEnumerator fadeOutCR = fadeOut(gridMaps[i]);
-            StartCoroutine(fadeOutCR);
-        }
-        layerNum = getLayerNum(startingPlayer.transform.parent);
-        IEnumerator fadeInCR = fadeIn(gridMaps[layerNum]);
-        StartCoroutine(fadeInCR);
-    }
-
-    void playerStart(){
-        players = GameObject.FindGameObjectsWithTag("Player");
+        //get starting player number 
         for(int i = 0; i < players.Length; i++){
             if(players[i] == startingPlayer){
                 playerNum = i;
                 break;
             }
         }
+        //highlight starting player with the outline color
         startingPlayer.gameObject.GetComponent<SpriteRenderer>().color = outline;
+
+        //get layer number based off 
+        layerNum = getLayerNum(startingPlayer.transform.parent);
+
+
+        //cause the rest of the layers to become invisible
+        for(int i = 0; i < layers.Length; i++){
+            IEnumerator fadeOutCR = layers[i].GetComponent<Layer>().fadeOut();
+            StartCoroutine(fadeOutCR);
+        }
+        //make the layer with the starting player visible
+        IEnumerator fadeInCR = layers[layerNum].GetComponent<Layer>().fadeIn();
+        StartCoroutine(fadeInCR);
     }
-    void layerSwitch(){
-        if (Input.mouseScrollDelta.y > 0 && (layerNum+1 < grid.childCount)){ // move layer up
-            IEnumerator fadeOutCR = fadeOut(gridMaps[layerNum]);
+
+    // Update is called once per frame
+    void Update()
+    {
+        layerSwitch();
+        playerSwitch();
+    }
+
+    void errorCheck(){
+        if(!startingPlayer.CompareTag("Player")){
+            Debug.LogError("A player was not placed in startingLayer");
+        }
+    }
+    
+    void layerSwitch(){ //the controls for switching views between layers 
+        if (Input.mouseScrollDelta.y > 0 && (layerNum+1 < layers.Length)){ // move layer up
+            /*IEnumerator fadeOutCR = map.fadeOut(layers[layerNum]);
             StartCoroutine(fadeOutCR);
             layerNum++;
-            IEnumerator fadeInCR = fadeIn(gridMaps[layerNum]);
-            StartCoroutine(fadeInCR);
+            IEnumerator fadeInCR = map.fadeIn(layers[layerNum]);
+            StartCoroutine(fadeInCR);*/
+            layerChange(layers[layerNum], layerNum+1);
         }else if(Input.mouseScrollDelta.y < 0 && (layerNum-1 >= 0)){ //move layer down 
-            IEnumerator fadeOutCR = fadeOut(gridMaps[layerNum]);
+            /*IEnumerator fadeOutCR = map.fadeOut(layers[layerNum]);
             StartCoroutine(fadeOutCR);
             layerNum--;
-            IEnumerator fadeInCR = fadeIn(gridMaps[layerNum]);
-            StartCoroutine(fadeInCR);
-
+            IEnumerator fadeInCR = map.fadeIn(layers[layerNum]);
+            StartCoroutine(fadeInCR);*/
+            layerChange(layers[layerNum], layerNum-1);
         }
     }
 
-    void playerSwitch(){
+    void playerSwitch(){ //the controls for switching the view between players
         if (Input.GetKeyDown("e") && (playerNum+1 < players.Length)){ // move layer up
             if(players[playerNum].transform.parent != players[playerNum+1].transform.parent){
-                IEnumerator fadeOutCR = fadeOut(gridMaps[layerNum]);
-                StartCoroutine(fadeOutCR);
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
                 playerNum++;
-                layerNum = getLayerNum(players[playerNum].transform.parent);
                 players[playerNum].GetComponent<SpriteRenderer>().color = outline;
-                IEnumerator fadeInCR = fadeIn(gridMaps[layerNum]);
-                StartCoroutine(fadeInCR);
+                layerChange(layers[layerNum], players[playerNum].transform.parent);
             }else{
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
                 playerNum++;
@@ -97,185 +92,43 @@ public class ShiftControl : MonoBehaviour
             }
         }else if(Input.GetKeyDown("q") && (playerNum-1 >= 0)){ //move layer down 
             if(players[playerNum].transform.parent != players[playerNum-1].transform.parent){
-                IEnumerator fadeOutCR = fadeOut(gridMaps[layerNum]);
-                StartCoroutine(fadeOutCR);
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
                 playerNum--;
-                layerNum = getLayerNum(players[playerNum].transform.parent);
                 players[playerNum].GetComponent<SpriteRenderer>().color = outline;
-                IEnumerator fadeInCR = fadeIn(gridMaps[layerNum]);
-                StartCoroutine(fadeInCR);
+                layerChange(layers[layerNum], players[playerNum].transform.parent);
+                
             }else{
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
                 playerNum--;
                 players[playerNum].GetComponent<SpriteRenderer>().color = outline;
             }
         }
-
     }
+
+    public void layerChange(Transform layer1, Transform layer2){
+        IEnumerator fadeOutCR = layers[layerNum].GetComponent<Layer>().fadeOut();
+        StartCoroutine(fadeOutCR);
+        layerNum = getLayerNum(layer2);
+        IEnumerator fadeInCR = layers[layerNum].GetComponent<Layer>().fadeIn();
+        StartCoroutine(fadeInCR);
+    }
+    public void layerChange(Transform layer, int nextLayerNum){
+        IEnumerator fadeOutCR = layers[layerNum].GetComponent<Layer>().fadeOut();
+        StartCoroutine(fadeOutCR);
+
+        layerNum = nextLayerNum;
+
+        IEnumerator fadeInCR = layers[layerNum].GetComponent<Layer>().fadeIn();
+        StartCoroutine(fadeInCR);
+    }
+
     int getLayerNum(Transform layer){
-        for(int i = 0; i < grid.childCount; i++){
-            if(gridMaps[i] == layer){
+        for(int i = 0; i < transform.childCount; i++){
+            if(layers[i] == layer){
                 return i;
             }
         }
         Debug.LogError("Layer doesn't exist. Failed to return layerindex");
         return -1; // crashes program. 
     }
-
-    void hideChildren(Transform layer){
-        foreach(Transform child in layer){
-            child.GetComponent<SpriteRenderer>().enabled = false;
-        }
-    }
-    
-    void revealChildren(Transform layer){
-        foreach(Transform child in layer){
-            child.GetComponent<SpriteRenderer>().enabled = true;
-        }
-    }
-
-    IEnumerator fadeIn(Transform layer){
-        Color tempColor;
-        Vector3Int tempPos;
-        LayerControl layerInfo = layer.GetComponent<LayerControl>();
-        int xCount = layerInfo.getBounds().xMin;
-        int yCount = layerInfo.getBounds().yMin;
-        for(float i = 0; i < 1; i += Time.deltaTime*fadeRate){
-            //fades in every tile of the layer
-            while(yCount <= layerInfo.getBounds().yMax){
-                tempPos = new Vector3Int(xCount, yCount, 0);
-                if(layer.GetComponent<Tilemap>().HasTile(tempPos)){
-                    layer.GetComponent<Tilemap>().SetTileFlags(tempPos, TileFlags.None);
-                    tempColor = layer.GetComponent<Tilemap>().GetColor(tempPos);
-                    Debug.Log(tempColor);
-                    tempColor.a = i;
-                    layer.GetComponent<Tilemap>().SetColor(tempPos, tempColor);
-                }
-
-                xCount++;
-                if(xCount > layerInfo.getBounds().xMax){
-                    xCount = layerInfo.getBounds().xMin;
-                    yCount++;
-                }
-            }
-            xCount = layerInfo.getBounds().xMin;
-            yCount = layerInfo.getBounds().yMin;
-            //fades in every child of the layer
-            foreach(Transform child in layer){
-                tempColor = child.GetComponent<SpriteRenderer>().color;
-                tempColor.a = i;
-                child.GetComponent<SpriteRenderer>().color = tempColor;
-            }
-            yield return null;
-        }
-        //ensures that everything has an alpha value of 0 
-        while(yCount <= layerInfo.getBounds().yMax){
-            tempPos = new Vector3Int(xCount, yCount, 0);
-            if(layer.GetComponent<Tilemap>().HasTile(tempPos)){
-                layer.GetComponent<Tilemap>().SetTileFlags(tempPos, TileFlags.None);
-                tempColor = layer.GetComponent<Tilemap>().GetColor(tempPos);
-                tempColor.a = 1;
-                layer.GetComponent<Tilemap>().SetColor(tempPos, tempColor);
-            }
-            //
-            xCount++;
-            if(xCount > layerInfo.getBounds().xMax){
-                xCount = layerInfo.getBounds().xMin;
-                yCount++;
-            }
-        }
-        foreach(Transform child in layer){
-            tempColor = child.GetComponent<SpriteRenderer>().color;
-            tempColor.a = 1;
-            child.GetComponent<SpriteRenderer>().color = tempColor;
-            child.gameObject.SetActive(true); //deactivates every child of the layer
-        }
-
-        //deactivates the layer afterwards so it doesn't interfere with other operations.
-        layer.gameObject.SetActive(true);
-    }
-    IEnumerator fadeOut(Transform layer){
-        Color tempColor;
-        Vector3Int tempPos;
-        LayerControl layerInfo = layer.GetComponent<LayerControl>();
-        int xCount = layerInfo.getBounds().xMin;
-        int yCount = layerInfo.getBounds().yMin;
-        for(float i = 1; i > 0; i -= Time.deltaTime*fadeRate){
-            //fades every tile of the layer
-            while(yCount <= layerInfo.getBounds().yMax){
-                //place stuff here
-                tempPos = new Vector3Int(xCount, yCount, 0);
-                if(layer.GetComponent<Tilemap>().HasTile(tempPos)){
-                    layer.GetComponent<Tilemap>().SetTileFlags(tempPos, TileFlags.None);
-                    tempColor = layer.GetComponent<Tilemap>().GetColor(tempPos);
-                    tempColor.a = i;
-                    layer.GetComponent<Tilemap>().SetColor(tempPos, tempColor);
-                }
-                //
-                xCount++;
-                if(xCount > layerInfo.getBounds().xMax){
-                    xCount = layerInfo.getBounds().xMin;
-                    yCount++;
-                }
-            }
-            xCount = layerInfo.getBounds().xMin;
-            yCount = layerInfo.getBounds().yMin;
-
-            //fades every child of the layer
-            foreach(Transform child in layer){
-                tempColor = child.GetComponent<SpriteRenderer>().color;
-                tempColor.a = i;
-                child.GetComponent<SpriteRenderer>().color = tempColor;
-            }
-            yield return null;
-        }
-
-        //ensures that everything has an alpha value of 0 
-        while(yCount <= layerInfo.getBounds().yMax){
-            tempPos = new Vector3Int(xCount, yCount, 0);
-            if(layer.GetComponent<Tilemap>().HasTile(tempPos)){
-                layer.GetComponent<Tilemap>().SetTileFlags(tempPos, TileFlags.None);
-                tempColor = layer.GetComponent<Tilemap>().GetColor(tempPos);
-                tempColor.a = 0;
-                layer.GetComponent<Tilemap>().SetColor(tempPos, tempColor);
-            }
-            //
-            xCount++;
-            if(xCount > layerInfo.getBounds().xMax){
-                xCount = layerInfo.getBounds().xMin;
-                yCount++;
-            }
-        }
-        foreach(Transform child in layer){
-            tempColor = child.GetComponent<SpriteRenderer>().color;
-            tempColor.a = 0;
-            child.GetComponent<SpriteRenderer>().color = tempColor;
-            child.gameObject.SetActive(false); //deactivates every child of the layer
-        }
-
-        //deactivates the layer afterwards so it doesn't interfere with other operations.
-        layer.gameObject.SetActive(false);
-    }
-    
-    IEnumerator testOut(Transform player){
-        //Debug.Log("Coroline testout called");
-        Color tempColor = player.GetComponent<SpriteRenderer>().color;
-        for(float i = 1f; i > 0f; i -= Time.deltaTime*fadeRate){
-            tempColor.a = i;
-            player.GetComponent<SpriteRenderer>().color = tempColor;
-            yield return null;
-        }
-        //yield return new WaitForSeconds(.5f);
-    }
-    IEnumerator testIn(Transform player){
-        //Debug.Log("Coroline testIn called");
-        Color tempColor = player.GetComponent<SpriteRenderer>().color;
-        for(float i = 0f; i < 1f; i += Time.deltaTime*fadeRate){
-            tempColor.a = i;
-            player.GetComponent<SpriteRenderer>().color = tempColor;
-             yield return null;
-        }
-        //yield return new WaitForSeconds(5f);
-    }  
 }

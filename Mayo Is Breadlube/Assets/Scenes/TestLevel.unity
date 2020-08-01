@@ -1025,6 +1025,37 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   testTile: {fileID: 11400000, guid: 31f0467df86e14d48af8f0e4bf964d63, type: 2}
+--- !u!1 &791992812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 791992813}
+  m_Layer: 0
+  m_Name: Level
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &791992813
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 791992812}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.481451, y: 0.53333455, z: -0.1687083}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 995835674}
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &995835672
 GameObject:
   m_ObjectHideFlags: 0
@@ -1037,7 +1068,7 @@ GameObject:
   - component: {fileID: 995835673}
   - component: {fileID: 995835675}
   m_Layer: 0
-  m_Name: Grid
+  m_Name: Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1062,15 +1093,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 995835672}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.481451, y: -0.53333455, z: 0.1687083}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1124521451}
   - {fileID: 770557183}
   - {fileID: 1586726983}
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_Father: {fileID: 791992813}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &995835675
 MonoBehaviour:
@@ -1085,8 +1116,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   grid: {fileID: 995835674}
-  gridMaps: []
-  players: []
+  layers: []
   startingPlayer: {fileID: 537418262}
   outline: {r: 1, g: 0, b: 0, a: 1}
   fadeRate: 2
