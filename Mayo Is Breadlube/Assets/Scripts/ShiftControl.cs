@@ -15,6 +15,9 @@ class ShiftControl : MonoBehaviour
     int layerNum;
     GameObject[] players;
     int playerNum;
+
+
+    bool shiftFinished = true;
     
 
     // Start is called before the first frame update
@@ -22,7 +25,6 @@ class ShiftControl : MonoBehaviour
     {   
         layers = map.getLayerTransforms(); // gets layers from map script
         players = map.getPlayerGameObjects(); // gets players from map script
-
         //get starting player number 
         for(int i = 0; i < players.Length; i++){
             if(players[i] == startingPlayer){
@@ -38,13 +40,22 @@ class ShiftControl : MonoBehaviour
 
 
         //cause the rest of the layers to become invisible
+        Color tempColor;
         for(int i = 0; i < layers.Length; i++){
-            IEnumerator fadeOutCR = layers[i].GetComponent<Layer>().fadeOut();
-            StartCoroutine(fadeOutCR);
+            layers[i].GetComponent<Layer>().changeOpacity(0);
+            foreach(Transform child in layers[i]){
+                tempColor = child.GetComponent<SpriteRenderer>().color;
+                tempColor.a = 0;
+                child.GetComponent<SpriteRenderer>().color = tempColor;
+            }
         }
         //make the layer with the starting player visible
-        IEnumerator fadeInCR = layers[layerNum].GetComponent<Layer>().fadeIn();
-        StartCoroutine(fadeInCR);
+        layers[layerNum].GetComponent<Layer>().changeOpacity(1);
+        foreach(Transform child in layers[layerNum]){
+            tempColor = child.GetComponent<SpriteRenderer>().color;
+            tempColor.a = 1;
+            child.GetComponent<SpriteRenderer>().color = tempColor;
+        }
     }
 
     // Update is called once per frame
@@ -61,24 +72,16 @@ class ShiftControl : MonoBehaviour
     }
     
     void layerSwitch(){ //the controls for switching views between layers 
+    if(shiftFinished)
         if (Input.mouseScrollDelta.y > 0 && (layerNum+1 < layers.Length)){ // move layer up
-            /*IEnumerator fadeOutCR = map.fadeOut(layers[layerNum]);
-            StartCoroutine(fadeOutCR);
-            layerNum++;
-            IEnumerator fadeInCR = map.fadeIn(layers[layerNum]);
-            StartCoroutine(fadeInCR);*/
             layerChange(layers[layerNum], layerNum+1);
         }else if(Input.mouseScrollDelta.y < 0 && (layerNum-1 >= 0)){ //move layer down 
-            /*IEnumerator fadeOutCR = map.fadeOut(layers[layerNum]);
-            StartCoroutine(fadeOutCR);
-            layerNum--;
-            IEnumerator fadeInCR = map.fadeIn(layers[layerNum]);
-            StartCoroutine(fadeInCR);*/
             layerChange(layers[layerNum], layerNum-1);
         }
     }
 
     void playerSwitch(){ //the controls for switching the view between players
+    if(shiftFinished)
         if (Input.GetKeyDown("e") && (playerNum+1 < players.Length)){ // move layer up
             if(players[playerNum].transform.parent != players[playerNum+1].transform.parent){
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
@@ -106,20 +109,16 @@ class ShiftControl : MonoBehaviour
     }
 
     public void layerChange(Transform layer1, Transform layer2){
-        IEnumerator fadeOutCR = layers[layerNum].GetComponent<Layer>().fadeOut();
-        StartCoroutine(fadeOutCR);
+        StartCoroutine(fadeOutLayer(layer1));
+        //StartCoroutine(fadeLayers(layer1, layer2));
         layerNum = getLayerNum(layer2);
-        IEnumerator fadeInCR = layers[layerNum].GetComponent<Layer>().fadeIn();
-        StartCoroutine(fadeInCR);
+        StartCoroutine(fadeInLayer(layer2));
     }
     public void layerChange(Transform layer, int nextLayerNum){
-        IEnumerator fadeOutCR = layers[layerNum].GetComponent<Layer>().fadeOut();
-        StartCoroutine(fadeOutCR);
-
+        StartCoroutine(fadeOutLayer(layer));
+        //StartCoroutine(fadeLayers(layer, layers[nextLayerNum]));
         layerNum = nextLayerNum;
-
-        IEnumerator fadeInCR = layers[layerNum].GetComponent<Layer>().fadeIn();
-        StartCoroutine(fadeInCR);
+        StartCoroutine(fadeInLayer(layers[layerNum]));
     }
 
     int getLayerNum(Transform layer){
@@ -130,5 +129,67 @@ class ShiftControl : MonoBehaviour
         }
         Debug.LogError("Layer doesn't exist. Failed to return layerindex");
         return -1; // crashes program. 
+    }
+    private IEnumerator fadeInLayer(Transform layer){
+        shiftFinished = false;
+
+        Color tempColor;
+
+        //activates the layer
+        layer.gameObject.SetActive(true);
+        //changeOpacity(0);
+        for(float i = 0; i < 1; i += Time.deltaTime*fadeRate){
+            //fadein every tile of the layer
+            layer.GetComponent<Layer>().changeOpacity(i);
+            //fadein every child of the layer
+            foreach(Transform child in layer){
+                tempColor = child.GetComponent<SpriteRenderer>().color;
+                tempColor.a = i;
+                child.GetComponent<SpriteRenderer>().color = tempColor;
+            }
+            yield return null;
+        }
+        //ensures that everything has an alpha value of 1 
+        layer.GetComponent<Layer>().changeOpacity(1);
+
+        foreach(Transform child in layer){
+            tempColor = child.GetComponent<SpriteRenderer>().color;
+            tempColor.a = 1;
+            child.GetComponent<SpriteRenderer>().color = tempColor;
+            child.gameObject.SetActive(true); //deactivates every child of the layer
+        }
+
+        shiftFinished = true;
+    }
+    private IEnumerator fadeOutLayer(Transform layer){
+        shiftFinished = false; 
+
+        Color tempColor;
+        for(float i = 1; i > 0; i -= Time.deltaTime*fadeRate){
+            //fades every tile of the layer
+            layer.GetComponent<Layer>().changeOpacity(i);
+            //fades every child of the layer
+            foreach(Transform child in layer){
+                tempColor = child.GetComponent<SpriteRenderer>().color;
+                tempColor.a = i;
+                child.GetComponent<SpriteRenderer>().color = tempColor;
+            }
+            yield return null;
+        }
+
+        //ensures that everything has an alpha value of 0 
+        layer.GetComponent<Layer>().changeOpacity(0);
+
+        foreach(Transform child in layer){
+            tempColor = child.GetComponent<SpriteRenderer>().color;
+            tempColor.a = 0;
+            child.GetComponent<SpriteRenderer>().color = tempColor;
+            //child.gameObject.SetActive(false); //deactivates every child of the layer
+            //Note child objects are automatically deactivated 
+        }
+        //deactivates the layer afterwards so it doesn't interfere with other operations.
+        layer.gameObject.SetActive(false);
+
+        shiftFinished = true;
     }
 }

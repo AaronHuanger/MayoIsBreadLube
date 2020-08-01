@@ -21,4 +21,7 @@ public class Level : MonoBehaviour
     public GameObject[] getPlayerGameObjects(){
         return players;
     }
+    public Transform[] getMaps(){
+        return maps;
+    }
 }

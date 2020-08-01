@@ -7,7 +7,6 @@ public class Layer : MonoBehaviour
 {
     public MyTileData[,] tiles; 
     public TileBase testTile;
-    public float fadeRate = 1f;
     private Tilemap curTileMap;
     private BoundsInt bounds;
 
@@ -20,7 +19,7 @@ public class Layer : MonoBehaviour
         //Note - the offset value of the x and y is the minValues of the bound of the x and y's
         // add the minBounds when you want to go from tileMap to array and subtract the minBound from the index of the array when going from array to tilemap positions.
         //ex: bounds.xMin and bounds.yMin. 
-        tiles = new MyTileData[Mathf.Abs(bounds.xMax - bounds.xMin)+1, Mathf.Abs(bounds.yMax - bounds.yMin)+1]; // creates an array of tiles based on the map
+        tiles = new MyTileData[bounds.size.x, bounds.size.y+1]; // creates an array of tiles based on the map
     }
 
     public BoundsInt getBounds(){
@@ -31,7 +30,7 @@ public class Layer : MonoBehaviour
         bounds = newBound;
     }
 
-    public static BoundsInt getTightBounds(Tilemap curTileMap){
+    private static BoundsInt getTightBounds(Tilemap curTileMap){
         int minX = int.MaxValue;
         int minY = int.MaxValue;
         int maxX = int.MinValue;
@@ -61,7 +60,7 @@ public class Layer : MonoBehaviour
         while(yCount <= bounds.yMax){
             Vector3Int tilePos = new Vector3Int(xCount, yCount, 0);
             if(!curTileMap.HasTile(tilePos)){
-                //curTileMap.SetTileFlags(tilePos, TileFlags.None);
+                curTileMap.SetTileFlags(tilePos, TileFlags.None);
                 curTileMap.SetTile(tilePos,testTile);
             }
             xCount++;
@@ -114,61 +113,5 @@ public class Layer : MonoBehaviour
                 yCount++;
             }
         }
-    }
-    public void removeTileFlags(){
-
-    }
-
-    public IEnumerator fadeIn(){
-        Color tempColor;
-        for(float i = 0; i < 1; i += Time.deltaTime*fadeRate){
-            //fadein every tile of the layer
-            changeOpacity(i);
-            //fadein every child of the layer
-            foreach(Transform child in transform){
-                tempColor = child.GetComponent<SpriteRenderer>().color;
-                tempColor.a = i;
-                child.GetComponent<SpriteRenderer>().color = tempColor;
-            }
-            yield return null;
-        }
-        //ensures that everything has an alpha value of 1 
-        changeOpacity(1);
-
-        foreach(Transform child in transform){
-            tempColor = child.GetComponent<SpriteRenderer>().color;
-            tempColor.a = 1;
-            child.GetComponent<SpriteRenderer>().color = tempColor;
-            child.gameObject.SetActive(true); //deactivates every child of the layer
-        }
-        //activates the layer
-        transform.gameObject.SetActive(true);
-    }
-    public IEnumerator fadeOut(){
-        Color tempColor;
-        for(float i = 1; i > 0; i -= Time.deltaTime*fadeRate){
-            //fades every tile of the layer
-            changeOpacity(i);
-            //fades every child of the layer
-            foreach(Transform child in transform){
-                tempColor = child.GetComponent<SpriteRenderer>().color;
-                tempColor.a = i;
-                child.GetComponent<SpriteRenderer>().color = tempColor;
-            }
-            yield return null;
-        }
-
-        //ensures that everything has an alpha value of 0 
-        changeOpacity(0);
-
-        foreach(Transform child in transform){
-            tempColor = child.GetComponent<SpriteRenderer>().color;
-            tempColor.a = 0;
-            child.GetComponent<SpriteRenderer>().color = tempColor;
-            //child.gameObject.SetActive(false); //deactivates every child of the layer
-            //Note child objects are automatically deactivated 
-        }
-        //deactivates the layer afterwards so it doesn't interfere with other operations.
-        transform.gameObject.SetActive(false);
     }
 }

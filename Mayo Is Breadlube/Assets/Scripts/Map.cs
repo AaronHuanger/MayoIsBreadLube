@@ -8,14 +8,7 @@ public class Map : MonoBehaviour
     Transform[] layers; //stores the tile maps of the grid object 
     GameObject[] players;
     
-    public GameObject[] getPlayerGameObjects(){
-        return players;
-    }
-    public Transform[] getLayerTransforms(){
-        return layers;
-    }
-    //Controls: mouse scrollbar --> shifts layesr
-    //          shift + mouse scroll --> shifts player
+
     void Awake()
     {   
         //get array of player from entire
@@ -29,4 +22,11 @@ public class Map : MonoBehaviour
         }
 
     }
+    public GameObject[] getPlayerGameObjects(){
+        return players;
+    }
+    public Transform[] getLayerTransforms(){
+        return layers;
+    }
+
 }

@@ -1034,6 +1034,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 791992813}
+  - component: {fileID: 791992814}
   m_Layer: 0
   m_Name: Level
   m_TagString: Untagged
@@ -1056,6 +1057,19 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &791992814
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 791992812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9889a34754c91f848b8888c861c6bc92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  players: []
 --- !u!1 &995835672
 GameObject:
   m_ObjectHideFlags: 0
@@ -1067,6 +1081,7 @@ GameObject:
   - component: {fileID: 995835674}
   - component: {fileID: 995835673}
   - component: {fileID: 995835675}
+  - component: {fileID: 995835676}
   m_Layer: 0
   m_Name: Map
   m_TagString: Untagged
@@ -1115,11 +1130,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae8fb1854065ba646bbebf5b34a8d143, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  grid: {fileID: 995835674}
-  layers: []
+--- !u!114 &995835676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 995835672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 358e94ed6fc9e644e8c284c530349e7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
   startingPlayer: {fileID: 537418262}
+  fadeRate: 1
   outline: {r: 1, g: 0, b: 0, a: 1}
-  fadeRate: 2
+  map: {fileID: 995835675}
 --- !u!1 &1124521450
 GameObject:
   m_ObjectHideFlags: 0
