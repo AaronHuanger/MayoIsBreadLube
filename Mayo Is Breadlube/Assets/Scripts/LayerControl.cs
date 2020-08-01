@@ -22,7 +22,7 @@ public class LayerControl : MonoBehaviour
         //Note - the offset value of the x and y is the minValues of the bound of the x and y's
         // add the minBounds when you want to go from tileMap to array and subtract the minBound from the index of the array when going from array to tilemap positions.
         //ex: bounds.xMin and bounds.yMin. 
-        tiles = new MyTileData[bounds.size.x, bounds.size.y]; // creates an array of tiles based on the map
+        tiles = new MyTileData[bounds.size.x + 1, bounds.size.y + 1]; // creates an array of tiles based on the map
     }
 
     public BoundsInt getBounds(){
