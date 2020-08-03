@@ -6,20 +6,25 @@ using UnityEngine.Tilemaps;
 public class Layer : MonoBehaviour
 {
     public MyTileData[,] tiles; 
+    public PathNode[,] pathNodes;
+    public BoundsInt pubBounds;
     public TileBase testTile;
     private Tilemap curTileMap;
     private BoundsInt bounds;
+   
 
     // Start is called before the first frame update
     void Awake()
     {
         curTileMap = transform.GetComponent<Tilemap>(); // gets the tilemap that this script is attached to 
         bounds = getTightBounds(curTileMap);
+        pubBounds = bounds;
         makeBoard();
         //Note - the offset value of the x and y is the minValues of the bound of the x and y's
         // add the minBounds when you want to go from tileMap to array and subtract the minBound from the index of the array when going from array to tilemap positions.
         //ex: bounds.xMin and bounds.yMin. 
         tiles = new MyTileData[bounds.size.x, bounds.size.y+1]; // creates an array of tiles based on the map
+        pathNodes = new PathNode[bounds.size.x + 1, bounds.size.y + 1];
     }
 
     public BoundsInt getBounds(){

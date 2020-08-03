@@ -19,8 +19,8 @@ public class PathFinding : MonoBehaviour
     // We first need to get our path node array, which will have the array with the appropriate bounds. 
     void Start() 
     {
-        grid = GetComponent<LayerControl>().pathNodes;  
-        bounds = GetComponent<LayerControl>().bounds;
+        grid = GetComponent<Layer>().pathNodes;  
+        bounds = GetComponent<Layer>().pubBounds;
     }
 
     public List<Vector3> FindPath(Vector3 startWorldPosition, Vector3 endWorldPosition)
