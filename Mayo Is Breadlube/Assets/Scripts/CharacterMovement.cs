@@ -6,7 +6,6 @@ public class CharacterMovement : MonoBehaviour
 {
     public float speed;
     public int moveDistance;
-    public TileBase testTile;
     private int currentPathIndex;
     private PathFinding pathFinding;
     private List<Vector3> pathList = null;
@@ -73,8 +72,6 @@ public class CharacterMovement : MonoBehaviour
                 tilePos = pathFinding.TilePosition(x,y); 
                 tiles.SetColor(tilePos, originalColor);
             }
-
-        Debug.Log("Current Position: " + unitX + ", " + unitY);
         for(int x = unitX - moveDistance; x <= unitX + moveDistance; x++)
         {
             for(int y = unitY - moveDistance; y <= unitY + moveDistance; y++)

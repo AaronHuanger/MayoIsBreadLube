@@ -33,9 +33,7 @@ public class PathNode
         this.yCalc = (y + bounds.yMin) * 0.5f; 
         // With the scaling and offsets accounter for, we simply do the conversion.
         // It is as simple as X = CartX - CartY, Y = (CartX + CartY) \ 2 or in this case * 0.5
-        isometricCoordinates = new Vector3(xCalc - yCalc, (xCalc + yCalc) * (0.5f)); 
-                                                                                     
-        
+        isometricCoordinates = new Vector3(xCalc - yCalc, (xCalc + yCalc) * (0.5f));                                                       
     }
 
     public void CalculateFCost()

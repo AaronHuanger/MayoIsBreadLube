@@ -25,8 +25,19 @@ public class Layer : MonoBehaviour
         //ex: bounds.xMin and bounds.yMin. 
         tiles = new MyTileData[bounds.size.x, bounds.size.y+1]; // creates an array of tiles based on the map
         pathNodes = new PathNode[bounds.size.x + 1, bounds.size.y + 1];
+        initializePathNode(pathNodes);
     }
 
+    public void initializePathNode(PathNode[,] pathNode)
+    {
+        for(int i = 0; i < pathNode.GetLength(0); i++)
+        {
+            for(int j = 0; j < pathNode.GetLength(1); j++)
+            {
+                pathNode[i,j] = new PathNode(i,j, pubBounds);
+            }
+        }
+    }
     public BoundsInt getBounds(){
         return bounds;
     }
