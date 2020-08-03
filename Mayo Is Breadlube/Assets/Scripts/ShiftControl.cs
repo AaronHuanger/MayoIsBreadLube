@@ -1,131 +1,195 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Tilemaps;
 
-public class ShiftControl : MonoBehaviour
+//shift controller for layers and players 
+class ShiftControl : MonoBehaviour
 {
-    private Transform startingLayer;
-    public Transform grid;
-    public Transform[] gridMaps; //stores the tile maps of the grid object 
-    int layerNum;
-    public GameObject[] players;
     public GameObject startingPlayer;
+    public float fadeRate = 0.5f;
     public Color outline = UnityEngine.Color.red;
 
+
+    public Map map;    
+    Transform[] layers;
+    int layerNum;
+    GameObject[] players;
     int playerNum;
+
+
+    bool shiftFinished = true;
     
-    //Controls: mouse scrollbar --> shifts layesr
-    //          shift + mouse scroll --> shifts player
+
+    // Start is called before the first frame update
     void Start()
     {   
-        gridStart();
-        playerStart();
-    }
-
-    void Update(){
-        layerSwitch();
-        playerSwitch();
-    }
-
-    void errorCheck(){
-        /*if(!startingLayer.CompareTag("Layer")){
-            Debug.LogError("A Layer was not placed in startingLayer");
-        }*/
-        if(!startingPlayer.CompareTag("Player")){
-            Debug.LogError("A player was not placed in startingLayer");
-        }
-    }
-
-    // BIG WARNING
-    //EVERYTHING HERE IS ME FUCKING WITH CODE TO SEE IF IT WOULD WORK WITH THE SHIFT, THIS IS NOT THE FINAL IMPLEMENTATION OF THE PATH FINDING.
-
-    void gridStart(){
-        //stores tile maps into an array for later access. 
-        int numChild = grid.childCount;
-        gridMaps = new Transform[numChild];
-        for(int i = 0; i < numChild; i++){
-            gridMaps[i] = grid.GetChild(i);
-            gridMaps[i].GetComponent<TilemapRenderer>().enabled = false;
-            gridMaps[i].GetComponent<PathFinding>().enabled = false;
-            hideChildren(gridMaps[i]);
-        }
-        layerNum = getLayerNum(startingPlayer.transform.parent);
-        gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
-        gridMaps[layerNum].GetComponent<PathFinding>().enabled = true;
-        revealChildren(gridMaps[layerNum]);
-    }
-
-    void playerStart(){
-        players = GameObject.FindGameObjectsWithTag("Player");
+        layers = map.getLayerTransforms(); // gets layers from map script
+        players = map.getPlayerGameObjects(); // gets players from map script
+        //get starting player number 
         for(int i = 0; i < players.Length; i++){
             if(players[i] == startingPlayer){
                 playerNum = i;
                 break;
             }
         }
+        //highlight starting player with the outline color
         startingPlayer.gameObject.GetComponent<SpriteRenderer>().color = outline;
-    }
-    void layerSwitch(){
-        if (Input.mouseScrollDelta.y > 0 && (layerNum+1 < grid.childCount)){ // move layer up
-            gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
-            gridMaps[layerNum].GetComponent<PathFinding>().enabled = false;
-            hideChildren(gridMaps[layerNum]);
-            layerNum++;
-            gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
-            gridMaps[layerNum].GetComponent<PathFinding>().enabled = true;
-            revealChildren(gridMaps[layerNum]);
-        }else if(Input.mouseScrollDelta.y < 0 && (layerNum-1 >= 0)){ //move layer down 
-            gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
-            gridMaps[layerNum].GetComponent<PathFinding>().enabled = false;
-            hideChildren(gridMaps[layerNum]);
-            layerNum--;
-            gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
-            gridMaps[layerNum].GetComponent<PathFinding>().enabled = true;
-            revealChildren(gridMaps[layerNum]);
+
+        //get layer number based off 
+        layerNum = getLayerNum(startingPlayer.transform.parent);
+
+
+        //cause the rest of the layers to become invisible
+        Color tempColor;
+        for(int i = 0; i < layers.Length; i++){
+            layers[i].GetComponent<Layer>().changeOpacity(0);
+            foreach(Transform child in layers[i]){
+                tempColor = child.GetComponent<SpriteRenderer>().color;
+                tempColor.a = 0;
+                child.GetComponent<SpriteRenderer>().color = tempColor;
+            }
+        }
+        //make the layer with the starting player visible
+        layers[layerNum].GetComponent<Layer>().changeOpacity(1);
+        foreach(Transform child in layers[layerNum]){
+            tempColor = child.GetComponent<SpriteRenderer>().color;
+            tempColor.a = 1;
+            child.GetComponent<SpriteRenderer>().color = tempColor;
         }
     }
 
-    void playerSwitch(){
-        if (Input.GetKeyDown("e") && (playerNum+1 < players.Length)){ // move layer up
-            gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
-            hideChildren(gridMaps[layerNum]);
-            players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
-            playerNum++;
-            layerNum = getLayerNum(players[playerNum].transform.parent);
-            players[playerNum].GetComponent<SpriteRenderer>().color = outline;
-            gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
-            revealChildren(gridMaps[layerNum]);
-        }else if(Input.GetKeyDown("q") && (playerNum-1 >= 0)){ //move layer down 
-            gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = false;
-            hideChildren(gridMaps[layerNum]);
-            players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
-            playerNum--;
-            layerNum = getLayerNum(players[playerNum].transform.parent);
-            players[playerNum].GetComponent<SpriteRenderer>().color = outline;
-            gridMaps[layerNum].GetComponent<TilemapRenderer>().enabled = true;
-            revealChildren(gridMaps[layerNum]);
+    // Update is called once per frame
+    void Update()
+    {
+        layerSwitch();
+        playerSwitch();
+    }
+
+    void errorCheck(){
+        if(!startingPlayer.CompareTag("Player")){
+            Debug.LogError("A player was not placed in startingLayer");
         }
     }
+    
+    void layerSwitch(){ //the controls for switching views between layers 
+    if(shiftFinished)
+        if (Input.mouseScrollDelta.y > 0 && (layerNum+1 < layers.Length)){ // move layer up
+            layerChange(layers[layerNum], layerNum+1);
+        }else if(Input.mouseScrollDelta.y < 0 && (layerNum-1 >= 0)){ //move layer down 
+            layerChange(layers[layerNum], layerNum-1);
+        }
+    }
+
+    void playerSwitch(){ //the controls for switching the view between players
+    if(shiftFinished)
+        if (Input.GetKeyDown("e") && (playerNum+1 < players.Length)){ // move layer up
+            if(players[playerNum].transform.parent != players[playerNum+1].transform.parent){
+                players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
+                playerNum++;
+                players[playerNum].GetComponent<SpriteRenderer>().color = outline;
+                layerChange(layers[layerNum], players[playerNum].transform.parent);
+            }else{
+                players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
+                playerNum++;
+                players[playerNum].GetComponent<SpriteRenderer>().color = outline;
+            }
+        }else if(Input.GetKeyDown("q") && (playerNum-1 >= 0)){ //move layer down 
+            if(players[playerNum].transform.parent != players[playerNum-1].transform.parent){
+                players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
+                playerNum--;
+                players[playerNum].GetComponent<SpriteRenderer>().color = outline;
+                layerChange(layers[layerNum], players[playerNum].transform.parent);
+                
+            }else{
+                players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
+                playerNum--;
+                players[playerNum].GetComponent<SpriteRenderer>().color = outline;
+            }
+        }
+    }
+
+    public void layerChange(Transform layer1, Transform layer2){
+        StartCoroutine(fadeOutLayer(layer1));
+        //StartCoroutine(fadeLayers(layer1, layer2));
+        layerNum = getLayerNum(layer2);
+        StartCoroutine(fadeInLayer(layer2));
+    }
+    public void layerChange(Transform layer, int nextLayerNum){
+        StartCoroutine(fadeOutLayer(layer));
+        //StartCoroutine(fadeLayers(layer, layers[nextLayerNum]));
+        layerNum = nextLayerNum;
+        StartCoroutine(fadeInLayer(layers[layerNum]));
+    }
+
     int getLayerNum(Transform layer){
-        for(int i = 0; i < grid.childCount; i++){
-            if(gridMaps[i] == layer){
+        for(int i = 0; i < transform.childCount; i++){
+            if(layers[i] == layer){
                 return i;
             }
         }
         Debug.LogError("Layer doesn't exist. Failed to return layerindex");
         return -1; // crashes program. 
     }
+    private IEnumerator fadeInLayer(Transform layer){
+        shiftFinished = false;
 
-    void hideChildren(Transform layer){
-        foreach(Transform child in layer){
-            child.GetComponent<SpriteRenderer>().enabled = false;
+        Color tempColor;
+
+        //activates the layer
+        layer.gameObject.SetActive(true);
+        //changeOpacity(0);
+        for(float i = 0; i < 1; i += Time.deltaTime*fadeRate){
+            //fadein every tile of the layer
+            layer.GetComponent<Layer>().changeOpacity(i);
+            //fadein every child of the layer
+            foreach(Transform child in layer){
+                tempColor = child.GetComponent<SpriteRenderer>().color;
+                tempColor.a = i;
+                child.GetComponent<SpriteRenderer>().color = tempColor;
+            }
+            yield return null;
         }
+        //ensures that everything has an alpha value of 1 
+        layer.GetComponent<Layer>().changeOpacity(1);
+
+        foreach(Transform child in layer){
+            tempColor = child.GetComponent<SpriteRenderer>().color;
+            tempColor.a = 1;
+            child.GetComponent<SpriteRenderer>().color = tempColor;
+            child.gameObject.SetActive(true); //deactivates every child of the layer
+        }
+
+        shiftFinished = true;
     }
-    
-    void revealChildren(Transform layer){
-        foreach(Transform child in layer){
-            child.GetComponent<SpriteRenderer>().enabled = true;
+    private IEnumerator fadeOutLayer(Transform layer){
+        shiftFinished = false; 
+
+        Color tempColor;
+        for(float i = 1; i > 0; i -= Time.deltaTime*fadeRate){
+            //fades every tile of the layer
+            layer.GetComponent<Layer>().changeOpacity(i);
+            //fades every child of the layer
+            foreach(Transform child in layer){
+                tempColor = child.GetComponent<SpriteRenderer>().color;
+                tempColor.a = i;
+                child.GetComponent<SpriteRenderer>().color = tempColor;
+            }
+            yield return null;
         }
+
+        //ensures that everything has an alpha value of 0 
+        layer.GetComponent<Layer>().changeOpacity(0);
+
+        foreach(Transform child in layer){
+            tempColor = child.GetComponent<SpriteRenderer>().color;
+            tempColor.a = 0;
+            child.GetComponent<SpriteRenderer>().color = tempColor;
+            //child.gameObject.SetActive(false); //deactivates every child of the layer
+            //Note child objects are automatically deactivated 
+        }
+        //deactivates the layer afterwards so it doesn't interfere with other operations.
+        layer.gameObject.SetActive(false);
+
+        shiftFinished = true;
     }
 }

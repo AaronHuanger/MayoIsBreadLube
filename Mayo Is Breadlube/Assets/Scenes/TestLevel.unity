@@ -133,7 +133,7 @@ GameObject:
   - component: {fileID: 53726399}
   m_Layer: 0
   m_Name: test_duck2
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -214,7 +214,7 @@ GameObject:
   - component: {fileID: 537418264}
   m_Layer: 0
   m_Name: test_duck3
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -296,7 +296,7 @@ GameObject:
   - component: {fileID: 642011024}
   m_Layer: 0
   m_Name: test_duck1
-  m_TagString: Untagged
+  m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -339,7 +339,7 @@ SpriteRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 4
+  m_SortingOrder: 0
   m_Sprite: {fileID: 21300000, guid: b4a7ad7a556bf0144840b49ba3cf2563, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
@@ -395,7 +395,7 @@ GameObject:
   - component: {fileID: 770557187}
   m_Layer: 0
   m_Name: GroundLayer
-  m_TagString: Untagged
+  m_TagString: Layer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -454,7 +454,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 1
+  m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -1041,23 +1041,70 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c6c2efb3658c0b142906ebe0902de1c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD:Mayo Is Breadlube/Assets/Scenes/SampleScene.unity
   testTile: {fileID: 11400000, guid: 624b59f885283004e953b0797a3ddbe5, type: 2}
   test: {fileID: 642011021}
   bounds:
     m_Position: {x: 0, y: 0, z: 0}
     m_Size: {x: 0, y: 0, z: 0}
 --- !u!114 &770557187
+=======
+  testTile: {fileID: 11400000, guid: 31f0467df86e14d48af8f0e4bf964d63, type: 2}
+--- !u!1 &791992812
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 791992813}
+  - component: {fileID: 791992814}
+  m_Layer: 0
+  m_Name: Level
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &791992813
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 791992812}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.481451, y: 0.53333455, z: -0.1687083}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children:
+  - {fileID: 995835674}
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &791992814
+>>>>>>> PlayerShift:Mayo Is Breadlube/Assets/Scenes/TestLevel.unity
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
+<<<<<<< HEAD:Mayo Is Breadlube/Assets/Scenes/SampleScene.unity
   m_GameObject: {fileID: 770557182}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: e6df742033d73b2408b92195280568b7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+=======
+  m_GameObject: {fileID: 791992812}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9889a34754c91f848b8888c861c6bc92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  players: []
+>>>>>>> PlayerShift:Mayo Is Breadlube/Assets/Scenes/TestLevel.unity
 --- !u!1 &995835672
 GameObject:
   m_ObjectHideFlags: 0
@@ -1069,8 +1116,9 @@ GameObject:
   - component: {fileID: 995835674}
   - component: {fileID: 995835673}
   - component: {fileID: 995835675}
+  - component: {fileID: 995835676}
   m_Layer: 0
-  m_Name: Grid
+  m_Name: Map
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1095,15 +1143,15 @@ Transform:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 995835672}
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -2.481451, y: -0.53333455, z: 0.1687083}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children:
   - {fileID: 1124521451}
   - {fileID: 770557183}
   - {fileID: 1586726983}
-  m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_Father: {fileID: 791992813}
+  m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &995835675
 MonoBehaviour:
@@ -1117,11 +1165,30 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ae8fb1854065ba646bbebf5b34a8d143, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+<<<<<<< HEAD:Mayo Is Breadlube/Assets/Scenes/SampleScene.unity
   grid: {fileID: 995835674}
   gridMaps: []
   players: []
   startingPlayer: {fileID: 642011021}
   outline: {r: 1, g: 0, b: 0, a: 1}
+=======
+--- !u!114 &995835676
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 995835672}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 358e94ed6fc9e644e8c284c530349e7a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  startingPlayer: {fileID: 537418262}
+  fadeRate: 1
+  outline: {r: 1, g: 0, b: 0, a: 1}
+  map: {fileID: 995835675}
+>>>>>>> PlayerShift:Mayo Is Breadlube/Assets/Scenes/TestLevel.unity
 --- !u!1 &1124521450
 GameObject:
   m_ObjectHideFlags: 0
@@ -1138,7 +1205,7 @@ GameObject:
   - component: {fileID: 1124521456}
   m_Layer: 0
   m_Name: UndergroundLayer
-  m_TagString: Untagged
+  m_TagString: Layer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -1195,7 +1262,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 0
   m_SortingLayer: 0
-  m_SortingOrder: 2
+  m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -1629,7 +1696,7 @@ GameObject:
   - component: {fileID: 1586726988}
   m_Layer: 0
   m_Name: SkyLayer
-  m_TagString: Untagged
+  m_TagString: Layer
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

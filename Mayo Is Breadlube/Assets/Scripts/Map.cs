@@ -1,8 +1,32 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Tilemaps;
 
-abstract public class Map 
+public class Map : MonoBehaviour
 {
-    List<Layer> layers;
+    Transform[] layers; //stores the tile maps of the grid object 
+    GameObject[] players;
+    
+
+    void Awake()
+    {   
+        //get array of player from entire
+        players = transform.GetComponentInParent<Level>().getPlayerGameObjects();
+
+        //get array of layer transform
+        int numChild = transform.childCount;
+        layers = new Transform[numChild];
+        for(int i = 0; i < numChild; i++){
+            layers[i] = transform.GetChild(i);
+        }
+
+    }
+    public GameObject[] getPlayerGameObjects(){
+        return players;
+    }
+    public Transform[] getLayerTransforms(){
+        return layers;
+    }
+
 }
