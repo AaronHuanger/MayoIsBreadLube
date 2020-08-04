@@ -90,8 +90,10 @@ class ShiftControl : MonoBehaviour
                 layerChange(layers[layerNum], players[playerNum].transform.parent);
             }else{
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
+                players[playerNum].GetComponent<CharacterMovement>().enabled = false;
                 playerNum++;
                 players[playerNum].GetComponent<SpriteRenderer>().color = outline;
+                players[playerNum].GetComponent<CharacterMovement>().enabled = true;
             }
         }else if(Input.GetKeyDown("q") && (playerNum-1 >= 0)){ //move layer down 
             if(players[playerNum].transform.parent != players[playerNum-1].transform.parent){
@@ -102,8 +104,10 @@ class ShiftControl : MonoBehaviour
                 
             }else{
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
+                players[playerNum].GetComponent<CharacterMovement>().enabled = false;
                 playerNum--;
                 players[playerNum].GetComponent<SpriteRenderer>().color = outline;
+                players[playerNum].GetComponent<CharacterMovement>().enabled = true;
             }
         }
     }
