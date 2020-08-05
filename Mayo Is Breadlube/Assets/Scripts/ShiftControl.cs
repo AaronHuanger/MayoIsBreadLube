@@ -47,6 +47,7 @@ class ShiftControl : MonoBehaviour
                 tempColor = child.GetComponent<SpriteRenderer>().color;
                 tempColor.a = 0;
                 child.GetComponent<SpriteRenderer>().color = tempColor;
+                child.GetComponent<CharacterMovement>().enabled = false;
             }
         }
         //make the layer with the starting player visible
@@ -56,6 +57,8 @@ class ShiftControl : MonoBehaviour
             tempColor.a = 1;
             child.GetComponent<SpriteRenderer>().color = tempColor;
         }
+
+        startingPlayer.gameObject.GetComponent<CharacterMovement>().enabled = true;
     }
 
     // Update is called once per frame
@@ -79,35 +82,56 @@ class ShiftControl : MonoBehaviour
             layerChange(layers[layerNum], layerNum-1);
         }
     }
+    
+    //Disables all the components of our game object, since its likely a characters gonna have more than one component, this comes in handy. 
+    void disableComponents(GameObject gameObject){
+        MonoBehaviour[] components = gameObject.GetComponents<MonoBehaviour>();
+        foreach(MonoBehaviour c in components)
+        {
+            c.enabled = false;
+        }
+    }
+
+    void enableComponents(GameObject gameObject){
+        MonoBehaviour[] components = gameObject.GetComponents<MonoBehaviour>();
+        foreach(MonoBehaviour c in components)
+        {
+            c.enabled = true;
+        }
+    }
 
     void playerSwitch(){ //the controls for switching the view between players
     if(shiftFinished)
         if (Input.GetKeyDown("e") && (playerNum+1 < players.Length)){ // move layer up
             if(players[playerNum].transform.parent != players[playerNum+1].transform.parent){
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
+                disableComponents(players[playerNum]);
                 playerNum++;
                 players[playerNum].GetComponent<SpriteRenderer>().color = outline;
+                enableComponents(players[playerNum]);
                 layerChange(layers[layerNum], players[playerNum].transform.parent);
             }else{
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
-                players[playerNum].GetComponent<CharacterMovement>().enabled = false;
+                disableComponents(players[playerNum]);
                 playerNum++;
                 players[playerNum].GetComponent<SpriteRenderer>().color = outline;
-                players[playerNum].GetComponent<CharacterMovement>().enabled = true;
+                enableComponents(players[playerNum]);
             }
         }else if(Input.GetKeyDown("q") && (playerNum-1 >= 0)){ //move layer down 
             if(players[playerNum].transform.parent != players[playerNum-1].transform.parent){
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
+                disableComponents(players[playerNum]);
                 playerNum--;
                 players[playerNum].GetComponent<SpriteRenderer>().color = outline;
+                enableComponents(players[playerNum]);
                 layerChange(layers[layerNum], players[playerNum].transform.parent);
                 
             }else{
                 players[playerNum].GetComponent<SpriteRenderer>().color = UnityEngine.Color.white;
-                players[playerNum].GetComponent<CharacterMovement>().enabled = false;
+                disableComponents(players[playerNum]);
                 playerNum--;
                 players[playerNum].GetComponent<SpriteRenderer>().color = outline;
-                players[playerNum].GetComponent<CharacterMovement>().enabled = true;
+                enableComponents(players[playerNum]);
             }
         }
     }
