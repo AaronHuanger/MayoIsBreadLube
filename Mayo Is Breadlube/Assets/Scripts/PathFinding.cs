@@ -47,7 +47,7 @@ public class PathFinding : MonoBehaviour
     
     public List<PathNode> FindPath(int startX, int startY, int endX, int endY)
     {
-        if(!hasPath(startX, startY, endX, endY))
+        if(outOfBounds(endX, endY))
         {
             return null;
         }
@@ -226,17 +226,6 @@ public class PathFinding : MonoBehaviour
         else 
          return false;
     }
-
-    public bool hasPath(int startX, int startY, int endX, int endY)
-    {
-        if(endX >= grid.GetLength(0) || endX < 0 || endY >= grid.GetLength(1) || endY < 0)
-        {
-            return false;
-        }
-        else 
-            return true;
-    }
-
     public Vector3 WorldPosition(int x, int y) 
     {
         float calcX, calcY;

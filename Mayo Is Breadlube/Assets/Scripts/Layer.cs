@@ -28,6 +28,7 @@ public class Layer : MonoBehaviour
         initializePathNode(pathNodes);
     }
 
+    // Essentially we fill out our grid for our pathnode algorithm. Here anything that is not the tile we use to fill out the map is a NON walkable tile. 
     public void initializePathNode(PathNode[,] pathNode)
     {
         for(int i = 0; i < pathNode.GetLength(0); i++)
@@ -35,6 +36,8 @@ public class Layer : MonoBehaviour
             for(int j = 0; j < pathNode.GetLength(1); j++)
             {
                 pathNode[i,j] = new PathNode(i,j, pubBounds);
+                if(curTileMap.GetTile(new Vector3Int(i+ bounds.xMin, j + bounds.yMin, 0) ) != testTile)
+                    pathNode[i,j].walkableTile = false;
             }
         }
     }

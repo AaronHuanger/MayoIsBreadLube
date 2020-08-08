@@ -18,6 +18,9 @@ public class CharacterMovement : MonoBehaviour
         Normal,
         Waiting
     }
+    // Start needs to collect a couple things. Sometime in the future ill try and reduce these file accesses but for now this is what were using.
+    // We need tilemap to change the color of walkable tiles, pathfinding for the actual path, and transform to move the character. 
+    // We have a state which is set to normal, which tells our code that its primed to take in input.
     private void Start()
     {
         Transform bodyTransform = GetComponent<Transform>();
@@ -27,10 +30,12 @@ public class CharacterMovement : MonoBehaviour
         state = State.Normal;
     }
 
-    // First in order to be able to display our possible moves were gonna need to check within a radius of our unit before hand and use our path finding to see if the move is valid.
-    // since we have the pathfinding component already we can use our GetXY function to help sort out where we can move before hand.
+
    
-    // Update is called once per frame
+    // Move is always called in update, however if you look at the code, whether it does anything or not depends on whether the pathlist actually has tiles to walk through. 
+    // If our state is normal, then were primed to take in input. From there we update the tiles we can move to, and wait for input. If we click a tile, then all we do is simply check if the 
+    //mouse position is within bounds and then if its within walking distance. If it is, we set our state to waiting (as in waiting to finish walking), and send our mouse world position
+    //to SetTargetPosition to send into the pathfinding algorithm. Walk then takes the path given to us by SetTargetPosition and executes the path until the list is empty again. 
     void Update()
     {
         Move();
@@ -41,7 +46,7 @@ public class CharacterMovement : MonoBehaviour
                 {
                     UpdateMovePosition();
                     pathFinding.GetXY(GetMouseWorldPosition(), out int x, out int y);
-                    Debug.Log("Mouse/Array Position: " + x + " , " + y);
+                    //Debug.Log("Mouse/Array Position: " + x + " , " + y);
                     if(!pathFinding.outOfBounds(x,y)) 
                     {
                         if(pathFinding.GetNode(x,y).withinDistance)
@@ -59,19 +64,19 @@ public class CharacterMovement : MonoBehaviour
     }
 
 
+
+    // To update what is and isnt within distance we deal exclusively with the pathfinding array (no world position transformations) aside from taking our mouse position and making it
+    // an xy position in the pathnode array. We offset by our movement distance as normal and need to check a couple things. First we need to test whether there is a node there. 
+    // IF there is we need to know whether we can even walk on it, and then we check if there can even be a path getting to that node. If there is a path then we check if its total
+    // length is less then our movement distance, and then FINALLY we can color it and mark it if it is. Everything else is deemed not within distance and is flagged appropirately. 
      private void UpdateMovePosition()
     {
         int unitX = 0;
         int unitY = 0;
         Vector3Int tilePos;
         pathFinding.GetXY(GetPosition(), out unitX, out unitY);
-        for(int x = 0; x < pathFinding.grid.GetLength(0); ++x)
-            for(int y = 0; y < pathFinding.grid.GetLength(1); ++y)
-            {
-                pathFinding.GetNode(x,y).withinDistance = false;
-                tilePos = pathFinding.TilePosition(x,y); 
-                tiles.SetColor(tilePos, originalColor);
-            }
+        cleanTiles();
+
         for(int x = unitX - moveDistance; x <= unitX + moveDistance; x++)
         {
             for(int y = unitY - moveDistance; y <= unitY + moveDistance; y++)
@@ -80,14 +85,15 @@ public class CharacterMovement : MonoBehaviour
                     continue;
                 if(pathFinding.isWalkable(x,y))
                 {
-                    if(pathFinding.hasPath(unitX, unitY, x, y))
+                    // We know we dont have a path if the list we get from our current position to some supposed position turns up null. 
+                    if(pathFinding.FindPath(unitX, unitY, x, y) != null)
                     {
                         if(pathFinding.FindPath(unitX, unitY, x, y).Count - 1 <= moveDistance)
                         {
-                           // Debug.Log(pathFinding.FindPath(unitX, unitY, x, y).Count);
-                           // Debug.Log("Is within distance: (" + x + " , " + y + ")");
+                            // Debug.Log(pathFinding.FindPath(unitX, unitY, x, y).Count);
+                            // Debug.Log("Is within distance: (" + x + " , " + y + ")");
                             pathFinding.GetNode(x,y).withinDistance = true;
-                            tilePos = pathFinding.TilePosition(x,y);   
+                            tilePos = pathFinding.TilePosition(x,y);
                             tiles.SetColor(tilePos, Color.green);
                         }
                         else
@@ -109,6 +115,7 @@ public class CharacterMovement : MonoBehaviour
             }
         }
     }
+    // Really all were doing here is getting our path list from our path finding algorithm. 
     void SetTargetPosition(Vector3 targetPosition)
     {
         currentPathIndex = 0;
@@ -143,6 +150,23 @@ public class CharacterMovement : MonoBehaviour
                 }
             }
         }
+    }
+
+    //turns our tiles back to its original color, and resets whether the tile is within distance of us or not.
+    private void cleanTiles()
+    {
+        // Our tile array doesnt really need to be manipulated in the same way it does with path finding i.e. transforming array positions into world positions. 
+        // The only thing to really watch out for is that the tile position is in whole integers and functions almost like a cartesian plane. This means (-1,3) is totally valid
+        // even though such a number cant be reacher with a normal for loop. The solution is just still using our same loop but offsetting what (0,0) is by adding the min bounds
+        // given in layer.
+        Vector3Int tilePos;
+        for(int x = 0; x < pathFinding.grid.GetLength(0); ++x)
+            for(int y = 0; y < pathFinding.grid.GetLength(1); ++y)
+            {
+                pathFinding.GetNode(x,y).withinDistance = false;
+                tilePos = pathFinding.TilePosition(x,y); 
+                tiles.SetColor(tilePos, originalColor);
+            }
     }
 
     // Just returns the current position. Really for the sake of making things look neat.
