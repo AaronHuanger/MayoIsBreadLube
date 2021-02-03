@@ -21,6 +21,7 @@ public class CharacterMovement : MonoBehaviour
     // Start needs to collect a couple things. Sometime in the future ill try and reduce these file accesses but for now this is what were using.
     // We need tilemap to change the color of walkable tiles, pathfinding for the actual path, and transform to move the character. 
     // We have a state which is set to normal, which tells our code that its primed to take in input.
+    // This is a test lmao .
     private void Start()
     {
         Transform bodyTransform = GetComponent<Transform>();
